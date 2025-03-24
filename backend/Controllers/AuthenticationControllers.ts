@@ -187,25 +187,9 @@ export const GetAuthenticatedUser = async (req: Request, res: Response) => {
 
     try {
         
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.user?._id).select("-password");
 
-        if (!user) {
-            return res.status(400).json({ message: "User Not Found !" });
-        }
-
-        res.status(200).json({
-            _id: user._id,
-            username: user.username,
-            fullName: user.fullName,
-            email: user.email,
-            profileImg: user.profileImg,
-            coverImg: user.coverImg,
-            bio: user.bio,
-            link: user.link,
-            followers: user.followers,
-            following: user.following,
-            likedPosts: user.likedPosts,
-        })
+        res.status(200).json(user);
 
 
     } catch (error) {
