@@ -6,6 +6,8 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import AuthenticationRoutes from './Routes/AuthenticationRoutes';
 import { ConnectDatabase } from './DataBase/DataBase';
+import UserRoutes from './Routes/UserRoutes';
+
 
 // ? Config .env ? \\
 dotenv.config();
@@ -36,6 +38,7 @@ app.use(helmet());
 
 // ? Routes ? \\
 app.use('/api/auth', AuthenticationRoutes);
+app.use('/api/user', UserRoutes);
 // ? Routes ? \\
 
 
