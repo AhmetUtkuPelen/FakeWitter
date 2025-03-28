@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import AuthenticationRoutes from './Routes/AuthenticationRoutes';
 import { ConnectDatabase } from './DataBase/DataBase';
 import UserRoutes from './Routes/UserRoutes';
+import PostRoutes from './Routes/PostRoutes';
 
 
 
@@ -44,6 +45,7 @@ app.use(helmet());
 // ? Routes ? \\
 app.use('/api/auth', AuthenticationRoutes);
 app.use('/api/user', UserRoutes);
+app.use('/api/post', PostRoutes);
 // ? Routes ? \\
 
 
