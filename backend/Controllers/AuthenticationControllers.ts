@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import User from '../Models/UserModel';
+import User, { IUser } from '../Models/UserModel';
 import bcryptJS from 'bcryptjs';
 import { GenerateToken } from '../Middlewares/GeneraToken';
-import { Error } from 'mongoose';
+
 
 
 // ? REGISTER ? \\
@@ -19,7 +19,7 @@ export const Register = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Invalid email format" });
         }
 
-        const existedUser = await User.findOne({ username: username });
+        const existedUser:IUser | null = await User.findOne({ username: username });
 
         if (existedUser) {
             return res.status(400).json({ message: "A User With This Username Already Exists !" });
@@ -71,7 +71,7 @@ export const Register = async (req: Request, res: Response) => {
         const salt = await bcryptJS.genSalt(10);
         const hashedPassword = await bcryptJS.hash(password, salt);
 
-        const newUser = new User({
+        const newUser:IUser = new User({
             username,
             fullName,
             password: hashedPassword,
@@ -105,10 +105,10 @@ export const Register = async (req: Request, res: Response) => {
         }
 
     } catch (error) {
-        
-        res.status(500).json(error);
-        console.log(error);
-
+        if(error instanceof Error){
+            res.status(500).json({ error: error.message });
+            console.log(error);
+        }
     }
 
 }
@@ -122,7 +122,7 @@ export const Login = async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body;
 
-        const user = await User.findOne({ username: username });
+        const user: IUser | null = await User.findOne({ username: username });
 
         if (!user) {
             return res.status(400).json({ message: "User Not Found !" });
@@ -134,10 +134,10 @@ export const Login = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Invalid Password !" });
         }
 
-        // Generate token before sending response
+        // ? Generate token before sending response ? \\
         await GenerateToken(user._id.toString(), res);
 
-        // Then send the response
+        // ? Then send the response ? \\
         res.status(200).json({
             _id: user._id,
             username: user.username,
@@ -152,8 +152,10 @@ export const Login = async (req: Request, res: Response) => {
             likedPosts: user.likedPosts,
         });
     } catch (error) {
-        res.status(500).json(error);
-        console.log(error);
+        if(error instanceof Error){
+            res.status(500).json({ error: error.message });
+            console.log(error);
+        }
     }
 }
 // ? LOGIN ? \\
@@ -171,10 +173,10 @@ export const LogOut = async (req: Request, res: Response) => {
         res.status(200).json({ message: "Logged out successfully" });
 	
     } catch (error) {
-
-        res.status(500).json(error);
-        console.log(error);
-	
+        if(error instanceof Error){
+            res.status(500).json({ error: error.message });
+            console.log(error);
+        }	
     }
 
 }
@@ -182,23 +184,19 @@ export const LogOut = async (req: Request, res: Response) => {
 
 
 // ? GET AUTHENTICATED USER ? \\
-
 export const GetAuthenticatedUser = async (req: Request, res: Response) => {
 
     try {
         
-        const user = await User.findById(req.user?._id).select("-password");
+        const user:IUser | null = await User.findById(req.user?._id).select("-password");
 
         res.status(200).json(user);
 
 
     } catch (error) {
-        
         res.status(500).json(error);
         console.log(error);
-
     }
 
 }
-
 // ? GET AUTHENTICATED USER ? \\

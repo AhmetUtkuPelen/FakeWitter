@@ -9,17 +9,21 @@ import { ConnectDatabase } from './DataBase/DataBase';
 import UserRoutes from './Routes/UserRoutes';
 
 
+
 // ? Config .env ? \\
 dotenv.config();
 // ? Config .env ? \\
 
 
+
 const app = express();
+
 
 
 // ? Port ? \\
 const PORT = process.env.PORT;
 // ? Port ? \\
+
 
 
 // ? Middlewares ? \\
@@ -36,10 +40,12 @@ app.use(helmet());
 // ? Middlewares ? \\
 
 
+
 // ? Routes ? \\
 app.use('/api/auth', AuthenticationRoutes);
 app.use('/api/user', UserRoutes);
 // ? Routes ? \\
+
 
 
 // ? Connect to database ? \\
