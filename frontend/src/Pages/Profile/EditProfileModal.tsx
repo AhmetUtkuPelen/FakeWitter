@@ -11,7 +11,7 @@ const EditProfileModal = () => {
 		currentPassword: "",
 	});
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
@@ -19,7 +19,10 @@ const EditProfileModal = () => {
 		<>
 			<button
 				className='btn btn-outline rounded-full btn-sm'
-				onClick={() => document.getElementById("edit_profile_modal").showModal()}
+				onClick={() => {
+					const modal = document.getElementById("edit_profile_modal");
+					if (modal instanceof HTMLDialogElement) modal.showModal();
+				}}
 			>
 				Edit profile
 			</button>

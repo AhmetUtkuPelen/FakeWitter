@@ -6,9 +6,9 @@ import { IoCloseSharp } from "react-icons/io5";
 const CreatePost = () => {
 
 	const [text, setText] = useState("");
-	const [img, setImg] = useState(null);
+	const [img, setImg] = useState<string | null>(null);
 
-	const imgRef = useRef(null);
+	const imgRef = useRef<HTMLInputElement>(null);
 
 	const isPending: boolean = false;
 	const isError: boolean = false;
@@ -23,11 +23,11 @@ const CreatePost = () => {
 	};
 
 	const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target?.files?[0];
+		const file = e.target?.files?.[0];
 		if (file) {
 			const reader = new FileReader();
 			reader.onload = () => {
-				setImg(reader.result);
+				setImg(reader.result as string);
 			};
 			reader.readAsDataURL(file);
 		}
@@ -53,7 +53,9 @@ const CreatePost = () => {
 							className='absolute top-0 right-0 text-white bg-gray-800 rounded-full w-5 h-5 cursor-pointer'
 							onClick={() => {
 								setImg(null);
-								imgRef.current.value = null;
+								if (imgRef.current) {
+									imgRef.current.value = "";
+								}
 							}}
 						/>
 						<img src={img} className='w-full mx-auto h-72 object-contain rounded' />
@@ -64,7 +66,7 @@ const CreatePost = () => {
 					<div className='flex gap-1 items-center'>
 						<CiImageOn
 							className='fill-primary w-6 h-6 cursor-pointer'
-							onClick={() => imgRef.current.click()}
+							onClick={() => imgRef.current?.click()}
 						/>
 						<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' />
 					</div>

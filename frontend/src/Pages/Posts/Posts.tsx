@@ -4,7 +4,9 @@ import Post from "../../Components/Post/Post";
 
 
 const Posts = () => {
-	const isLoading = false;
+
+
+	const isLoading : boolean = false;
 
 	return (
 		<>

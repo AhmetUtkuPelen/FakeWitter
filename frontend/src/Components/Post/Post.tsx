@@ -6,7 +6,31 @@ import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-const Post = ({ post:any }) => {
+interface PostProps {
+
+	post: {
+		user: {
+			username: string;
+			fullName: string;
+			profileImg?: string;
+		};
+		text: string;
+		img?: string;
+		_id: string;
+		comments: {
+			_id: string;
+			text: string;
+			user: {
+				username: string;
+				fullName: string;
+				profileImg?: string;
+			};
+		}[];
+		likes: any[];
+	};
+}
+
+const Post = ({ post }: PostProps) => {
 	const [comment, setComment] = useState("");
 	const postOwner = post.user;
 	const isLiked = false;
@@ -63,7 +87,10 @@ const Post = ({ post:any }) => {
 						<div className='flex gap-4 items-center w-2/3 justify-between'>
 							<div
 								className='flex gap-1 items-center cursor-pointer group'
-								onClick={() => document.getElementById("comments_modal" + post._id).showModal()}
+								onClick={() => {
+									const modal = document.getElementById("comments_modal" + post._id);
+									if (modal instanceof HTMLDialogElement) modal.showModal();
+								}}
 							>
 								<FaRegComment className='w-4 h-4  text-slate-500 group-hover:text-sky-400' />
 								<span className='text-sm text-slate-500 group-hover:text-sky-400'>

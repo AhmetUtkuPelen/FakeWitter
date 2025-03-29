@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModal from "./EditProfileModal";
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -8,15 +7,18 @@ import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import Posts from "../Posts/Posts";
 import { POSTS } from "../../Utility/DataBase/DummyDataBase";
+import ProfileHeaderSkeleton from "../../Components/Skeletons/ProfileHeaderSkeleton";
+import Boy2 from "../../assets/avatars/boy2.png"
+import CoverImg from "../../assets/cover.png"
 
 
 const ProfilePage = () => {
-	const [coverImg, setCoverImg] = useState(null);
-	const [profileImg, setProfileImg] = useState(null);
+	const [coverImg, setCoverImg] = useState<string | null>(null);
+	const [profileImg, setProfileImg] = useState<string | null>(null);
 	const [feedType, setFeedType] = useState("posts");
 
-	const coverImgRef = useRef(null);
-	const profileImgRef = useRef(null);
+	const coverImgRef = useRef<HTMLInputElement>(null);
+	const profileImgRef = useRef<HTMLInputElement>(null);
 
 	const isLoading = false;
 	const isMyProfile = true;
@@ -25,21 +27,21 @@ const ProfilePage = () => {
 		_id: "1",
 		fullName: "John Doe",
 		username: "johndoe",
-		profileImg: "/avatars/boy2.png",
-		coverImg: "/cover.png",
+		profileImg: Boy2,
+		coverImg: CoverImg,
 		bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 		link: "https://youtube.com/@asaprogrammer_",
 		following: ["1", "2", "3"],
 		followers: ["1", "2", "3"],
 	};
 
-	const handleImgChange = (e, state) => {
-		const file = e.target.files[0];
+	const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: string) => {
+		const file = e.target?.files?.[0];
 		if (file) {
 			const reader = new FileReader();
 			reader.onload = () => {
-				state === "coverImg" && setCoverImg(reader.result);
-				state === "profileImg" && setProfileImg(reader.result);
+				state === "coverImg" && setCoverImg(reader.result as string);
+				state === "profileImg" && setProfileImg(reader.result as string);
 			};
 			reader.readAsDataURL(file);
 		}
@@ -66,14 +68,14 @@ const ProfilePage = () => {
 							{/* COVER IMG */}
 							<div className='relative group/cover'>
 								<img
-									src={coverImg || user?.coverImg || "/cover.png"}
+									src={coverImg || user?.coverImg || CoverImg}
 									className='h-52 w-full object-cover'
 									alt='cover image'
 								/>
 								{isMyProfile && (
 									<div
 										className='absolute top-2 right-2 rounded-full p-2 bg-gray-800 bg-opacity-75 cursor-pointer opacity-0 group-hover/cover:opacity-100 transition duration-200'
-										onClick={() => coverImgRef.current.click()}
+										onClick={() => coverImgRef.current?.click()}
 									>
 										<MdEdit className='w-5 h-5 text-white' />
 									</div>
@@ -99,7 +101,7 @@ const ProfilePage = () => {
 											{isMyProfile && (
 												<MdEdit
 													className='w-4 h-4 text-white'
-													onClick={() => profileImgRef.current.click()}
+													onClick={() => profileImgRef.current?.click()}
 												/>
 											)}
 										</div>
