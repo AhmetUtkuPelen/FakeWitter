@@ -8,6 +8,7 @@ import AuthenticationRoutes from './Routes/AuthenticationRoutes';
 import { ConnectDatabase } from './DataBase/DataBase';
 import UserRoutes from './Routes/UserRoutes';
 import PostRoutes from './Routes/PostRoutes';
+import NotificationsRoutes from './Routes/NotificationsRoutes';
 
 
 
@@ -46,6 +47,7 @@ app.use(helmet());
 app.use('/api/auth', AuthenticationRoutes);
 app.use('/api/user', UserRoutes);
 app.use('/api/post', PostRoutes);
+app.use('/api/notification', NotificationsRoutes);
 // ? Routes ? \\
 
 
