@@ -8,10 +8,14 @@ import XSvg from "../../Components/svgs/X";
 
 const LoginPage = () => {
 
+
+	// ? Form Data Interface ? \\
   interface FormData {
     username: string;
     password: string;
   }
+	// ? Form Data Interface ? \\
+
 
 
 	const [formData, setFormData] = useState<FormData>({
@@ -19,17 +23,26 @@ const LoginPage = () => {
 		password: "",
 	});
 
+
+	// ? Handle Submit ? \\
 	const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		console.log(formData);
 	};
+	// ? Handle Submit ? \\
 
+
+
+	// ? Handle Input Change ? \\
 	const HandleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
+	// ? Handle Input Change ? \\
 
-	const isError = false;
 
+	const isError : boolean = false;
+
+	
 	return (
 		<div className='max-w-screen-xl mx-auto flex h-screen'>
 			<div className='flex-1 hidden lg:flex items-center  justify-center'>

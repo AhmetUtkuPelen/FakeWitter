@@ -5,7 +5,7 @@ import RightPanelSkeleton from "../Skeletons/RightPanelSkeleton";
 
 const RightPanel = () => {
 
-    const isLoading = false;
+    const isLoading : boolean = false;
 
 	return (
 		<div className='hidden lg:block my-4 mx-2'>

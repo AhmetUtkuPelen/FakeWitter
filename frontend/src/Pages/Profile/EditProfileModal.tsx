@@ -1,7 +1,21 @@
 import { useState } from "react";
 
 const EditProfileModal = () => {
-	const [formData, setFormData] = useState({
+
+	// ? Form Data Interface ? \\
+	interface FormData {
+		fullName: string;
+		username: string;
+		email: string;
+		bio: string;
+		link: string;
+		newPassword: string;
+		currentPassword: string;
+	}
+
+
+
+	const [formData, setFormData] = useState<FormData>({
 		fullName: "",
 		username: "",
 		email: "",
@@ -11,9 +25,14 @@ const EditProfileModal = () => {
 		currentPassword: "",
 	});
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+	// ? Handle Input Change ? \\
+	const HandleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
+	// ? Handle Input Change ? \\
+
+
 
 	return (
 		<>
@@ -43,7 +62,7 @@ const EditProfileModal = () => {
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
 								value={formData.fullName}
 								name='fullName'
-								onChange={handleInputChange}
+								onChange={HandleInputChange}
 							/>
 							<input
 								type='text'
@@ -51,7 +70,7 @@ const EditProfileModal = () => {
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
 								value={formData.username}
 								name='username'
-								onChange={handleInputChange}
+								onChange={HandleInputChange}
 							/>
 						</div>
 						<div className='flex flex-wrap gap-2'>
@@ -61,14 +80,14 @@ const EditProfileModal = () => {
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
 								value={formData.email}
 								name='email'
-								onChange={handleInputChange}
+								onChange={HandleInputChange}
 							/>
 							<textarea
 								placeholder='Bio'
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
 								value={formData.bio}
 								name='bio'
-								onChange={handleInputChange}
+								onChange={HandleInputChange}
 							/>
 						</div>
 						<div className='flex flex-wrap gap-2'>
@@ -78,7 +97,7 @@ const EditProfileModal = () => {
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
 								value={formData.currentPassword}
 								name='currentPassword'
-								onChange={handleInputChange}
+								onChange={HandleInputChange}
 							/>
 							<input
 								type='password'
@@ -86,7 +105,7 @@ const EditProfileModal = () => {
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
 								value={formData.newPassword}
 								name='newPassword'
-								onChange={handleInputChange}
+								onChange={HandleInputChange}
 							/>
 						</div>
 						<input
@@ -95,7 +114,7 @@ const EditProfileModal = () => {
 							className='flex-1 input border border-gray-700 rounded p-2 input-md'
 							value={formData.link}
 							name='link'
-							onChange={handleInputChange}
+							onChange={HandleInputChange}
 						/>
 						<button className='btn btn-primary rounded-full btn-sm text-white'>Update</button>
 					</form>

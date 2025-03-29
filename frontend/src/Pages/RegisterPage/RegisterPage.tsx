@@ -10,12 +10,16 @@ import XSvg from "../../Components/svgs/X";
 
 const RegisterPage = () => {
 
+	// ? Form Data Interface ? \\
     interface FormData {
 		email: string;
 		username: string;
 		fullName: string;
 		password: string;
 	}
+	// ? Form Data Interface ? \\
+
+
 
     const [formData, setFormData] = useState<FormData>({
         email: "",
@@ -24,28 +28,37 @@ const RegisterPage = () => {
         password: ""
     });
 
+
+
+	// ? Handle Submit ? \\
 	const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		console.log(formData);
 	};
+	// ? Handle Submit ? \\
 
+
+
+	// ? Handle Input Change ? \\
 	const HandleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
+	// ? Handle Input Change ? \\
 
 
-	const isError = false;
+
+	const isError : boolean = false;
 
 
 	return (
 		<div className='max-w-screen-xl mx-auto flex h-screen px-10'>
-			<div className='flex-1 hidden lg:flex items-center  justify-center'>
+			<div className='flex-1 hidden lg:flex items-center justify-center'>
 				<XSvg className=' lg:w-2/3 fill-white' />
 			</div>
 			<div className='flex-1 flex flex-col justify-center items-center'>
 				<form className='lg:w-2/3  mx-auto md:mx-20 flex gap-4 flex-col' onSubmit={HandleSubmit}>
 					<XSvg className='w-24 lg:hidden fill-white' />
-					<h1 className='text-4xl font-extrabold text-white'>Join today.</h1>
+					<h1 className='text-4xl font-extrabold text-white text-center'>Join Today.</h1>
 					<label className='input input-bordered rounded flex items-center gap-2'>
 						<MdOutlineMail />
 						<input
@@ -96,7 +109,7 @@ const RegisterPage = () => {
 					{isError && <p className='text-red-500'>Something went wrong</p>}
 				</form>
 				<div className='flex flex-col lg:w-2/3 gap-2 mt-4'>
-					<p className='text-white text-lg'>Already have an account?</p>
+					<p className='text-white text-lg text-center'>Already have an account?</p>
 					<Link to='/login'>
 						<button className='btn rounded-full btn-primary text-white btn-outline w-full'>LOGIN</button>
 					</Link>

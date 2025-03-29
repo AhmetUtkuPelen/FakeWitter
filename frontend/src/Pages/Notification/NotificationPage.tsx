@@ -4,10 +4,27 @@ import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 
+// ? Notification Interface ? \\
+interface Notification {
+  _id: string;
+  from: {
+    _id: string;
+    username: string;
+    profileImg?: string;
+  };
+  type: "follow" | "like";
+  read?: boolean;
+}
+// ? Notification Interface ? \\
+
+
 
 const NotificationPage = () => {
-	const isLoading = false;
-	const notifications = [
+
+
+	const isLoading : boolean = false;
+	
+	const notifications : Notification[] = [
 		{
 			_id: "1",
 			from: {
@@ -28,9 +45,15 @@ const NotificationPage = () => {
 		},
 	];
 
-	const deleteNotifications = () => {
+
+
+	// ? Delete Notifications ? \\
+	const DeleteNotifications = () => {
 		alert("All notifications deleted");
 	};
+	// ? Delete Notifications ? \\
+
+
 
 	return (
 		<>
@@ -46,7 +69,7 @@ const NotificationPage = () => {
 							className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52'
 						>
 							<li>
-								<a onClick={deleteNotifications}>Delete all notifications</a>
+								<a onClick={DeleteNotifications}>Delete all notifications</a>
 							</li>
 						</ul>
 					</div>

@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 
 interface PostProps {
 
+	// ? Post Interface ? \\
 	post: {
 		user: {
 			username: string;
@@ -29,25 +30,37 @@ interface PostProps {
 		likes: any[];
 	};
 }
+	// ? Post Interface ? \\
+
 
 const Post = ({ post }: PostProps) => {
 	const [comment, setComment] = useState("");
-	const postOwner = post.user;
-	const isLiked = false;
+	const postOwner : any = post.user;
+	const isLiked : boolean = false;
 
-	const isMyPost = true;
+	const isMyPost : boolean = true;
 
-	const formattedDate = "1h";
+	const formattedDate : string = "1h";
 
-	const isCommenting = false;
+	const isCommenting : boolean = false;
 
-	const handleDeletePost = () => {};
+	// ? Handle Delete Post ?\\
+	const HandleDeletePost = () => {};
+	// ? Handle Delete Post\\
 
-	const handlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
+
+
+	// ? Handle Post Comment ?\\
+	const HandlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 	};
+	// ? Handle Post Comment\\
 
-	const handleLikePost = () => {};
+
+	// ? Handle Like Post ?\\
+	const HandleLikePost = () => {};
+	// ? Handle Like Post ?\\
+
 
 	return (
 		<>
@@ -69,7 +82,7 @@ const Post = ({ post }: PostProps) => {
 						</span>
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>
-								<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
+								<FaTrash className='cursor-pointer hover:text-red-500' onClick={HandleDeletePost} />
 							</span>
 						)}
 					</div>
@@ -130,7 +143,7 @@ const Post = ({ post }: PostProps) => {
 									</div>
 									<form
 										className='flex gap-2 items-center mt-4 border-t border-gray-600 pt-2'
-										onSubmit={handlePostComment}
+										onSubmit={HandlePostComment}
 									>
 										<textarea
 											className='textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800'
@@ -155,7 +168,7 @@ const Post = ({ post }: PostProps) => {
 								<BiRepost className='w-6 h-6  text-slate-500 group-hover:text-green-500' />
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div>
-							<div className='flex gap-1 items-center group cursor-pointer' onClick={handleLikePost}>
+							<div className='flex gap-1 items-center group cursor-pointer' onClick={HandleLikePost}>
 								{!isLiked && (
 									<FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />
 								)}

@@ -13,6 +13,23 @@ import CoverImg from "../../assets/cover.png"
 
 
 const ProfilePage = () => {
+
+	// ? User Interface ? \\
+	interface User {
+		_id: string;
+		fullName: string;
+		username: string;
+		profileImg?: string;
+		coverImg?: string;
+		bio: string;
+		link: string;
+		following: string[];
+		followers: string[];
+	}
+	// ? User Interface ? \\
+
+
+
 	const [coverImg, setCoverImg] = useState<string | null>(null);
 	const [profileImg, setProfileImg] = useState<string | null>(null);
 	const [feedType, setFeedType] = useState("posts");
@@ -20,10 +37,11 @@ const ProfilePage = () => {
 	const coverImgRef = useRef<HTMLInputElement>(null);
 	const profileImgRef = useRef<HTMLInputElement>(null);
 
-	const isLoading = false;
-	const isMyProfile = true;
+	const isLoading : boolean = false;
+	const isMyProfile : boolean = true;
 
-	const user = {
+	// ? User Data ? \\
+	const user : User = {
 		_id: "1",
 		fullName: "John Doe",
 		username: "johndoe",
@@ -34,8 +52,11 @@ const ProfilePage = () => {
 		following: ["1", "2", "3"],
 		followers: ["1", "2", "3"],
 	};
+	// ? User Data ? \\
 
-	const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: string) => {
+
+	// ? Handle Image Change ? \\
+	const HandleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: string) => {
 		const file = e.target?.files?.[0];
 		if (file) {
 			const reader = new FileReader();
@@ -46,6 +67,9 @@ const ProfilePage = () => {
 			reader.readAsDataURL(file);
 		}
 	};
+	// ? Handle Image Change ? \\
+
+
 
 	return (
 		<>
@@ -85,13 +109,13 @@ const ProfilePage = () => {
 									type='file'
 									hidden
 									ref={coverImgRef}
-									onChange={(e) => handleImgChange(e, "coverImg")}
+									onChange={(e) => HandleImgChange(e, "coverImg")}
 								/>
 								<input
 									type='file'
 									hidden
 									ref={profileImgRef}
-									onChange={(e) => handleImgChange(e, "profileImg")}
+									onChange={(e) => HandleImgChange(e, "profileImg")}
 								/>
 								{/* USER AVATAR */}
 								<div className='avatar absolute -bottom-16 left-4'>

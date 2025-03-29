@@ -1,4 +1,26 @@
-export const POSTS = [
+// ? Posts Interface ? \\
+interface Post {
+	_id: string;
+	text: string;
+	img?: string;
+	user: {
+		username: string;
+		profileImg?: string;
+		fullName: string;
+	};
+	comments: {
+		_id: string;
+		text: string;
+		user: {
+			username: string;
+			profileImg?: string;
+			fullName: string;
+		};
+	}[];
+	likes: string[];
+}
+
+export const POSTS : Post[] = [
 	{
 		_id: "1",
 		text: "Let's build a fullstack WhatsApp clone with NEXT.JS 14 😍",
@@ -88,7 +110,19 @@ export const POSTS = [
 	},
 ];
 
-export const USERS_FOR_RIGHT_PANEL = [
+
+
+// ? Users For Right Panel Interface ? \\
+interface UserForRightPanel {
+	_id: string;
+	fullName: string;
+	username: string;
+	profileImg?: string;
+}
+// ? Users For Right Panel Interface ? \\
+
+
+export const USERS_FOR_RIGHT_PANEL : UserForRightPanel[] = [
 	{
 		_id: "1",
 		fullName: "John Doe",

@@ -2,6 +2,7 @@ import { CiImageOn } from "react-icons/ci";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
+import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 
 const CreatePost = () => {
 
@@ -13,16 +14,23 @@ const CreatePost = () => {
 	const isPending: boolean = false;
 	const isError: boolean = false;
 
+
+
 	const data = {
 		profileImg: "/avatars/boy1.png",
 	};
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+	// ? Handle Submit ? \\
+	const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		alert("Post created successfully");
 	};
+	// ? Handle Submit ? \\
 
-	const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+	// ? Handle Image Change ? \\
+	const HandleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target?.files?.[0];
 		if (file) {
 			const reader = new FileReader();
@@ -32,15 +40,18 @@ const CreatePost = () => {
 			reader.readAsDataURL(file);
 		}
 	};
+	// ? Handle Image Change ? \\
+
+
 
 	return (
 		<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
 			<div className='avatar'>
 				<div className='w-8 rounded-full'>
-					<img src={data.profileImg || "/avatar-placeholder.png"} />
+					<img src={data.profileImg || PlaceHolderImg} />
 				</div>
 			</div>
-			<form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>
+			<form className='flex flex-col gap-2 w-full' onSubmit={HandleSubmit}>
 				<textarea
 					className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800'
 					placeholder='What is happening?!'
@@ -70,7 +81,7 @@ const CreatePost = () => {
 						/>
 						<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' />
 					</div>
-					<input type='file' hidden ref={imgRef} onChange={handleImgChange} />
+					<input type='file' hidden ref={imgRef} onChange={HandleImgChange} />
 					<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
 						{isPending ? "Posting..." : "Post"}
 					</button>
