@@ -5,6 +5,8 @@ import { FaUser } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";
 import { MdDriveFileRenameOutline } from "react-icons/md";
 import XSvg from "../../Components/svgs/X";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 
 
@@ -30,10 +32,48 @@ const RegisterPage = () => {
 
 
 
+	// ? Register Mutation ? \\
+	const {mutate,isError,isPending,error} =useMutation({
+		mutationFn : async (formData:FormData) => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(formData),
+				});
+
+				const data = await response.json();
+
+				if(!response.ok){
+					throw new Error(data.error || "Something went wrong Creating User !");
+				}
+				
+				return data;
+			
+			} catch (error) {
+				if(error instanceof Error){
+					toast.error(error.message);
+				}
+			}
+		},
+		onSuccess : () => {
+			toast.success("Registered Successfully !");
+		},
+		onError : () => {
+			toast.error("Something went wrong !");
+		}
+	});
+	// ? Register Mutation ? \\
+
+
+
+
 	// ? Handle Submit ? \\
 	const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		console.log(formData);
+		mutate(formData)
 	};
 	// ? Handle Submit ? \\
 
@@ -45,9 +85,6 @@ const RegisterPage = () => {
 	};
 	// ? Handle Input Change ? \\
 
-
-
-	const isError : boolean = false;
 
 
 	return (
@@ -105,8 +142,10 @@ const RegisterPage = () => {
 							value={formData.password}
 						/>
 					</label>
-					<button className='btn rounded-full btn-primary text-white'>REGISTER</button>
-					{isError && <p className='text-red-500'>Something went wrong</p>}
+					<button className='btn rounded-full btn-primary text-white'>
+						{isPending ? "REGISTERING..." : "REGISTER"}
+					</button>
+					{isError && <p className='text-red-500'>{error?.message}</p>}
 				</form>
 				<div className='flex flex-col lg:w-2/3 gap-2 mt-4'>
 					<p className='text-white text-lg text-center'>Already have an account?</p>

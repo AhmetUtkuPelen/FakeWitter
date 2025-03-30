@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { MdOutlineMail } from "react-icons/md";
 import { MdPassword } from "react-icons/md";
 import XSvg from "../../Components/svgs/X";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 
 
@@ -24,10 +26,50 @@ const LoginPage = () => {
 	});
 
 
+	// ? Login Mutation ? \\
+	const {mutate,isPending,isError,error} = useMutation({
+		mutationFn : async (formData:FormData) => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(formData),
+				});
+
+				const data = await response.json();
+
+				if(!response.ok){
+					throw new Error(data.error || "Something Went Wrong Logging In !");
+				}
+				
+				return data;
+			
+			} catch (error) {
+				if(error instanceof Error){
+					toast.error(error.message);
+				}
+			}
+		},
+
+		onSuccess : () => {
+			toast.success("Logged In Successfully !");
+		},
+		onError : () => {
+			toast.error("Something Went Wrong Logging In !");
+		}
+
+	})
+
+
 	// ? Handle Submit ? \\
 	const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		
 		e.preventDefault();
-		console.log(formData);
+		
+		mutate(formData)
+	
 	};
 	// ? Handle Submit ? \\
 
@@ -39,8 +81,6 @@ const LoginPage = () => {
 	};
 	// ? Handle Input Change ? \\
 
-
-	const isError : boolean = false;
 
 	
 	return (
@@ -75,8 +115,12 @@ const LoginPage = () => {
 							value={formData.password}
 						/>
 					</label>
-					<button className='btn rounded-full btn-primary text-white'>Login</button>
-					{isError && <p className='text-red-500'>Something went wrong</p>}
+					<button className='btn rounded-full btn-primary text-white'>
+						{isPending ? "LOGGING IN..." : "LOGIN"}
+					</button>
+					{isError && <p className='text-red-500'>
+						{error instanceof Error ? error.message : "Something went wrong"}
+						</p>}
 				</form>
 				<div className='flex flex-col gap-2 mt-4'>
 					<p className='text-white text-lg'>{"Don't"} have an account?</p>

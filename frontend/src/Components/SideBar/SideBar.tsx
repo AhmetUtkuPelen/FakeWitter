@@ -6,14 +6,51 @@ import { BiLogOut } from "react-icons/bi";
 import XSvg from "../svgs/X";
 import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 import Boy1Img from "../../assets/avatars/boy1.png"
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const SideBar = () => {
+
 
     const data = {
 		fullName: "John Doe",
 		username: "johndoe",
 		profileImg: Boy1Img,
 	};
+
+
+	const {mutate:LogOut,error} = useMutation({
+		mutationFn : async () => {
+			try {
+				const response = await fetch(`http://localhost:9999/api/auth/logout`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+
+				if(!response.ok){
+					throw new Error("Something Went Wrong Logging Out!");
+				}
+				
+				return await response.json();
+			
+			} catch (error) {
+				if(error instanceof Error){
+					console.log(error.message);
+					throw error;
+				}
+			}
+		},
+		onSuccess : () => {
+			toast.success("Logged Out Successfully !");
+			window.location.reload();
+		},
+		onError : () => {
+			toast.error( error?.message || "Something Went Wrong Logging Out !");
+		}
+	})
 
     
 	return (
@@ -53,6 +90,7 @@ const SideBar = () => {
 					</li>
 				</ul>
 				{data && (
+					<>
 					<Link
 						to={`/profile/${data.username}`}
 						className='mt-auto mb-10 flex gap-2 items-start transition-all duration-300 hover:bg-[#181818] py-2 px-4 rounded-full'
@@ -67,9 +105,16 @@ const SideBar = () => {
 								<p className='text-white font-bold text-sm w-20 truncate'>{data?.fullName}</p>
 								<p className='text-slate-500 text-sm'>@{data?.username}</p>
 							</div>
-							<BiLogOut className='w-5 h-5 cursor-pointer' />
+							<BiLogOut 
+								className='w-5 h-5 cursor-pointer' 
+								onClick={(e: React.MouseEvent) => {
+									e.preventDefault();
+									LogOut();
+								}} 
+							/>
 						</div>
 					</Link>
+					</>
 				)}
 			</div>
 		</div>
