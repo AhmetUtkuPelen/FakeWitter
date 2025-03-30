@@ -3,6 +3,10 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
+import Boy2Img from "../../assets/avatars/boy2.png"
+import Girl1Img from "../../assets/avatars/girl1.png"
+import PlaceHolderImg from "../../assets/avatar-placeholder.png"
+
 
 // ? Notification Interface ? \\
 interface Notification {
@@ -24,13 +28,14 @@ const NotificationPage = () => {
 
 	const isLoading : boolean = false;
 	
+
 	const notifications : Notification[] = [
 		{
 			_id: "1",
 			from: {
 				_id: "1",
 				username: "johndoe",
-				profileImg: "/avatars/boy2.png",
+				profileImg: Boy2Img,
 			},
 			type: "follow",
 		},
@@ -39,7 +44,7 @@ const NotificationPage = () => {
 			from: {
 				_id: "2",
 				username: "janedoe",
-				profileImg: "/avatars/girl1.png",
+				profileImg: Girl1Img,
 			},
 			type: "like",
 		},
@@ -69,7 +74,7 @@ const NotificationPage = () => {
 							className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52'
 						>
 							<li>
-								<a onClick={DeleteNotifications}>Delete all notifications</a>
+								<a onClick={DeleteNotifications}>Delete All Notifications</a>
 							</li>
 						</ul>
 					</div>
@@ -80,7 +85,7 @@ const NotificationPage = () => {
 					</div>
 				)}
 				{notifications?.length === 0 && <div className='text-center p-4 font-bold'>No notifications 🤔</div>}
-				{notifications?.map((notification) => (
+				{notifications?.map((notification: Notification) => (
 					<div className='border-b border-gray-700' key={notification._id}>
 						<div className='flex gap-2 p-4'>
 							{notification.type === "follow" && <FaUser className='w-7 h-7 text-primary' />}
@@ -88,7 +93,7 @@ const NotificationPage = () => {
 							<Link to={`/profile/${notification.from.username}`}>
 								<div className='avatar'>
 									<div className='w-8 rounded-full'>
-										<img src={notification.from.profileImg || "/avatar-placeholder.png"} />
+										<img src={notification.from.profileImg || PlaceHolderImg} />
 									</div>
 								</div>
 								<div className='flex gap-1'>

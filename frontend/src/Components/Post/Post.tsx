@@ -5,8 +5,11 @@ import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import PlaceHolderImg from "../../assets/avatar-placeholder.png"
+
 
 interface PostProps {
+
 
 	// ? Post Interface ? \\
 	post: {
@@ -33,9 +36,29 @@ interface PostProps {
 	// ? Post Interface ? \\
 
 
+	// ? User Interface ? \\
+	interface User {
+		username: string;
+		fullName: string;
+		profileImg?: string;
+	}
+	// ? User Interface ? \\
+
+
+
+	// ? Comment Interface ? \\
+	interface Comment {
+		_id: string;
+		text: string;
+		user: User;
+	}
+
+
+
 const Post = ({ post }: PostProps) => {
-	const [comment, setComment] = useState("");
-	const postOwner : any = post.user;
+	
+	const [comment, setComment] = useState<string>("");
+	const postOwner : User = post.user;
 	const isLiked : boolean = false;
 
 	const isMyPost : boolean = true;
@@ -43,6 +66,7 @@ const Post = ({ post }: PostProps) => {
 	const formattedDate : string = "1h";
 
 	const isCommenting : boolean = false;
+
 
 	// ? Handle Delete Post ?\\
 	const HandleDeletePost = () => {};
@@ -57,6 +81,7 @@ const Post = ({ post }: PostProps) => {
 	// ? Handle Post Comment\\
 
 
+
 	// ? Handle Like Post ?\\
 	const HandleLikePost = () => {};
 	// ? Handle Like Post ?\\
@@ -67,7 +92,7 @@ const Post = ({ post }: PostProps) => {
 			<div className='flex gap-2 items-start p-4 border-b border-gray-700'>
 				<div className='avatar'>
 					<Link to={`/profile/${postOwner.username}`} className='w-8 rounded-full overflow-hidden'>
-						<img src={postOwner.profileImg || "/avatar-placeholder.png"} />
+						<img src={postOwner.profileImg || PlaceHolderImg} />
 					</Link>
 				</div>
 				<div className='flex flex-col flex-1'>
@@ -110,17 +135,17 @@ const Post = ({ post }: PostProps) => {
 									{post.comments.length}
 								</span>
 							</div>
-							{/* We're using Modal Component from DaisyUI */}
+
 							<dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
 								<div className='modal-box rounded border border-gray-600'>
 									<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
 									<div className='flex flex-col gap-3 max-h-60 overflow-auto'>
 										{post.comments.length === 0 && (
 											<p className='text-sm text-slate-500'>
-												No comments yet 🤔 Be the first one 😉
+												No Comments Yet 🤔 Be The First One 😉
 											</p>
 										)}
-										{post.comments.map((comment) => (
+										{post.comments.map((comment : Comment) => (
 											<div key={comment._id} className='flex gap-2 items-start'>
 												<div className='avatar'>
 													<div className='w-8 rounded-full'>
@@ -147,7 +172,7 @@ const Post = ({ post }: PostProps) => {
 									>
 										<textarea
 											className='textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800'
-											placeholder='Add a comment...'
+											placeholder='Add A Comment...'
 											value={comment}
 											onChange={(e) => setComment(e.target.value)}
 										/>
@@ -161,7 +186,7 @@ const Post = ({ post }: PostProps) => {
 									</form>
 								</div>
 								<form method='dialog' className='modal-backdrop'>
-									<button className='outline-none'>close</button>
+									<button className='outline-none'>Close</button>
 								</form>
 							</dialog>
 							<div className='flex gap-1 items-center group cursor-pointer'>

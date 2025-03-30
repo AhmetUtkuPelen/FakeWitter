@@ -10,6 +10,7 @@ import { POSTS } from "../../Utility/DataBase/DummyDataBase";
 import ProfileHeaderSkeleton from "../../Components/Skeletons/ProfileHeaderSkeleton";
 import Boy2 from "../../assets/avatars/boy2.png"
 import CoverImg from "../../assets/cover.png"
+import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 
 
 const ProfilePage = () => {
@@ -32,7 +33,7 @@ const ProfilePage = () => {
 
 	const [coverImg, setCoverImg] = useState<string | null>(null);
 	const [profileImg, setProfileImg] = useState<string | null>(null);
-	const [feedType, setFeedType] = useState("posts");
+	const [feedType, setFeedType] = useState<"posts" | "likes">("posts");
 
 	const coverImgRef = useRef<HTMLInputElement>(null);
 	const profileImgRef = useRef<HTMLInputElement>(null);
@@ -76,7 +77,7 @@ const ProfilePage = () => {
 			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
 				{/* HEADER */}
 				{isLoading && <ProfileHeaderSkeleton />}
-				{!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
+				{!isLoading && !user && <p className='text-center text-lg mt-4'>User Not Found</p>}
 				<div className='flex flex-col'>
 					{!isLoading && user && (
 						<>
@@ -108,19 +109,21 @@ const ProfilePage = () => {
 								<input
 									type='file'
 									hidden
+									accept='image/*'
 									ref={coverImgRef}
 									onChange={(e) => HandleImgChange(e, "coverImg")}
 								/>
 								<input
 									type='file'
 									hidden
+									accept='image/*'
 									ref={profileImgRef}
 									onChange={(e) => HandleImgChange(e, "profileImg")}
 								/>
 								{/* USER AVATAR */}
 								<div className='avatar absolute -bottom-16 left-4'>
 									<div className='w-32 rounded-full relative group/avatar'>
-										<img src={profileImg || user?.profileImg || "/avatar-placeholder.png"} />
+										<img src={profileImg || user?.profileImg || PlaceHolderImg} />
 										<div className='absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer'>
 											{isMyProfile && (
 												<MdEdit

@@ -1,9 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { USERS_FOR_RIGHT_PANEL } from "../../Utility/DataBase/DummyDataBase";
 import RightPanelSkeleton from "../Skeletons/RightPanelSkeleton";
+import PlaceHolderImg from "../../assets/avatar-placeholder.png";
 
 
 const RightPanel = () => {
+
+
+	// ? Users For Right Panel Interface ? \\
+	interface UserForRightPanel {
+		_id: string;
+		fullName: string;
+		username: string;
+		profileImg?: string;
+	}
+
 
     const isLoading : boolean = false;
 
@@ -22,23 +33,23 @@ const RightPanel = () => {
 						</>
 					)}
 					{!isLoading &&
-						USERS_FOR_RIGHT_PANEL?.map((user) => (
+						USERS_FOR_RIGHT_PANEL?.map((user:UserForRightPanel) => (
 							<Link
-								to={`/profile/${user.username}`}
+								to={`/profile/${user?.username}`}
 								className='flex items-center justify-between gap-4'
-								key={user._id}
+								key={user?._id}
 							>
 								<div className='flex gap-2 items-center'>
 									<div className='avatar'>
 										<div className='w-8 rounded-full'>
-											<img src={user.profileImg || "/avatar-placeholder.png"} />
+											<img src={user?.profileImg || PlaceHolderImg} />
 										</div>
 									</div>
 									<div className='flex flex-col'>
 										<span className='font-semibold tracking-tight truncate w-28'>
-											{user.fullName}
+											{user?.fullName}
 										</span>
-										<span className='text-sm text-slate-500'>@{user.username}</span>
+										<span className='text-sm text-slate-500'>@{user?.username}</span>
 									</div>
 								</div>
 								<div>

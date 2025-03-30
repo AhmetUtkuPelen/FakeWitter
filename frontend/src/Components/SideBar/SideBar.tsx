@@ -4,14 +4,15 @@ import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import XSvg from "../svgs/X";
-
+import PlaceHolderImg from "../../assets/avatar-placeholder.png"
+import Boy1Img from "../../assets/avatars/boy1.png"
 
 const SideBar = () => {
 
     const data = {
 		fullName: "John Doe",
 		username: "johndoe",
-		profileImg: "/avatars/boy1.png",
+		profileImg: Boy1Img,
 	};
 
     
@@ -58,7 +59,7 @@ const SideBar = () => {
 					>
 						<div className='avatar hidden md:inline-flex'>
 							<div className='w-8 rounded-full'>
-								<img src={data?.profileImg || "/avatar-placeholder.png"} />
+								<img src={data?.profileImg || PlaceHolderImg} />
 							</div>
 						</div>
 						<div className='flex justify-between flex-1'>

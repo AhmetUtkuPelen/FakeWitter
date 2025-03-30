@@ -3,10 +3,12 @@ import { BsEmojiSmileFill } from "react-icons/bs";
 import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import PlaceHolderImg from "../../assets/avatar-placeholder.png"
+import Boy1Img from "../../assets/avatars/boy1.png"
+
 
 const CreatePost = () => {
 
-	const [text, setText] = useState("");
+	const [text, setText] = useState<string>("");
 	const [img, setImg] = useState<string | null>(null);
 
 	const imgRef = useRef<HTMLInputElement>(null);
@@ -17,8 +19,9 @@ const CreatePost = () => {
 
 
 	const data = {
-		profileImg: "/avatars/boy1.png",
+		profileImg: Boy1Img,
 	};
+
 
 
 	// ? Handle Submit ? \\
@@ -27,6 +30,7 @@ const CreatePost = () => {
 		alert("Post created successfully");
 	};
 	// ? Handle Submit ? \\
+
 
 
 	// ? Handle Image Change ? \\
@@ -81,12 +85,12 @@ const CreatePost = () => {
 						/>
 						<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' />
 					</div>
-					<input type='file' hidden ref={imgRef} onChange={HandleImgChange} />
+					<input type='file' hidden ref={imgRef} onChange={HandleImgChange} accept="image/*" />
 					<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
 						{isPending ? "Posting..." : "Post"}
 					</button>
 				</div>
-				{isError && <div className='text-red-500'>Something went wrong</div>}
+				{isError && <div className='text-red-500'>Something Went Wrong !</div>}
 			</form>
 		</div>
 	);
