@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import HomePage from "./Pages/HomePage/HomePage"
 import RegisterPage from "./Pages/RegisterPage/RegisterPage"
 import LoginPage from "./Pages/LoginPage/LoginPage"
@@ -7,7 +7,7 @@ import RightPanel from "./Components/RightPanel/RightPanel"
 import NotificationPage from "./Pages/Notification/NotificationPage"
 import ProfilePage from "./Pages/Profile/ProfilePage"
 import { useQuery } from "@tanstack/react-query"
-import toast from "react-hot-toast"
+import toast, { Toaster } from "react-hot-toast"
 import LoadingSpinner from "./Components/LoadingSpinner/LoadingSpinner"
 
 
@@ -16,7 +16,7 @@ function App() {
 
 
   // ? Get Authenticated User Query ? \\
-  const {data,isLoading,error,isError} = useQuery({
+  const {data:authenticatedUser,isLoading} = useQuery({
     queryKey : ["authenticatedUser"],
     queryFn : async () => {
       try {
@@ -30,7 +30,9 @@ function App() {
 
         const data = await response.json();
 
-        console.log("Authenticated User : ",data);
+        if(data.error){
+          return null;
+        }
 
         if(!response.ok){
           throw new Error(data.error || "Something Went Wrong Getting Authenticated User !");
@@ -43,9 +45,11 @@ function App() {
           toast.error(error.message);
         }
       }
-    }
+    },
+    retry: false,
   })
   // ? Get Authenticated User Query ? \\
+
 
 
   if(isLoading){
@@ -57,17 +61,19 @@ function App() {
   }
 
 
+
   return (
     <div className="flex max-w-6xl mx-auto">
-      <SideBar/>
+      {authenticatedUser && <SideBar/>}
       <Routes>
-        <Route path='/' element={<HomePage />} />
-				<Route path='/register' element={<RegisterPage />} />
-				<Route path='/login' element={<LoginPage />} />
-				<Route path='/notifications' element={<NotificationPage />} />
-				<Route path='/profile/:username' element={<ProfilePage />} />
+        <Route path='/' element={authenticatedUser ? <HomePage /> : <Navigate to='/login' />} />
+				<Route path='/register' element={!authenticatedUser ? <RegisterPage /> : <Navigate to='/' />} />
+				<Route path='/login' element={!authenticatedUser ? <LoginPage /> : <Navigate to='/' />} />
+				<Route path='/notifications' element={authenticatedUser ? <NotificationPage /> : <Navigate to='/login' />} />
+				<Route path='/profile/:username' element={authenticatedUser ? <ProfilePage /> : <Navigate to='/login' />} />
       </Routes>
-      <RightPanel/>
+      {authenticatedUser && <RightPanel/>}
+      <Toaster/>
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { MdOutlineMail } from "react-icons/md";
 import { MdPassword } from "react-icons/md";
 import XSvg from "../../Components/svgs/X";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 
@@ -24,6 +24,13 @@ const LoginPage = () => {
 		username: "",
 		password: "",
 	});
+
+
+
+	// ? Query Client ? \\
+	const queryClient = useQueryClient();
+	// ? Query Client ? \\
+
 
 
 	// ? Login Mutation ? \\
@@ -54,6 +61,8 @@ const LoginPage = () => {
 		},
 
 		onSuccess : () => {
+			// ? Invalidate Authenticated User Query That Comes From App.tsx ? \\
+			queryClient.invalidateQueries({queryKey : ["authenticatedUser"]});
 			toast.success("Logged In Successfully !");
 		},
 		onError : () => {
