@@ -8,10 +8,9 @@ import { Link } from "react-router-dom";
 import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 
 
-interface PostProps {
-
 
 	// ? Post Interface ? \\
+interface PostProps {
 	post: {
 		user: {
 			username: string;
@@ -55,7 +54,7 @@ interface PostProps {
 
 
 
-const Post = ({ post }: PostProps) => {
+const Post = ({post} : PostProps) => {
 	
 	const [comment, setComment] = useState<string>("");
 	const postOwner : User = post.user;

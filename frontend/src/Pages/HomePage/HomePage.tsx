@@ -7,7 +7,7 @@ import CreatePost from "../CreatePost/CreatePost";
 const HomePage = () => {
 
 
-	const [feedType, setFeedType] = useState("forYou");
+	const [contentType, setContentType] = useState("forYou");
 
 	
 	return (
@@ -19,19 +19,19 @@ const HomePage = () => {
 						className={
 							"flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative"
 						}
-						onClick={() => setFeedType("forYou")}
+						onClick={() => setContentType("forYou")}
 					>
 						For you
-						{feedType === "forYou" && (
+						{contentType === "forYou" && (
 							<div className='absolute bottom-0 w-10  h-1 rounded-full bg-primary'></div>
 						)}
 					</div>
 					<div
 						className='flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative'
-						onClick={() => setFeedType("following")}
+						onClick={() => setContentType("following")}
 					>
 						Following
-						{feedType === "following" && (
+						{contentType === "following" && (
 							<div className='absolute bottom-0 w-10  h-1 rounded-full bg-primary'></div>
 						)}
 					</div>
@@ -41,7 +41,7 @@ const HomePage = () => {
 				<CreatePost />
 
 				{/* POSTS */}
-				<Posts />
+				<Posts contentType={contentType} />
 			</div>
 		</>
 	);
