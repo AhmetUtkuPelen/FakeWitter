@@ -6,6 +6,9 @@ import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import PlaceHolderImg from "../../assets/avatar-placeholder.png"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 
 
@@ -13,6 +16,7 @@ import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 interface PostProps {
 	post: {
 		user: {
+			_id: string;
 			username: string;
 			fullName: string;
 			profileImg?: string;
@@ -37,6 +41,7 @@ interface PostProps {
 
 	// ? User Interface ? \\
 	interface User {
+		_id?: string;
 		username: string;
 		fullName: string;
 		profileImg?: string;
@@ -57,10 +62,51 @@ interface PostProps {
 const Post = ({post} : PostProps) => {
 	
 	const [comment, setComment] = useState<string>("");
+
+	const {data:authUser} = useQuery<User | null>({queryKey:["authenticatedUser"]});
+
+	// ? Delete Post Query ? \\
+	const queryDeleteClient = useQueryClient();
+	// ? Delete Post Query ? \\
+
+	const {mutate:deletePost,isPending} = useMutation({
+		mutationFn : async () => {
+			try {
+				const response = await fetch(`import.meta.env.VITE_BACKEND_URL}/api/posts/deletePost/${post._id}`, {
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+
+				const data = await response.json();
+
+				if(!response.ok){
+					throw new Error(data.error || "Something Went Wrong Deleting Post !");
+				}
+				
+				return data;
+			
+			} catch (error) {
+				if(error instanceof Error){
+					console.log(error.message);
+				}
+			}
+		},
+		onSuccess : () => {
+			toast.success("Post Deleted Successfully !");
+			queryDeleteClient.invalidateQueries({queryKey : ["posts"]});
+		}
+
+	})
+
 	const postOwner : User = post.user;
 	const isLiked : boolean = false;
 
-	const isMyPost : boolean = true;
+	// ? Check If Post Is Owned By Authenticated User ? \\
+	const isMyPost : boolean = authUser?._id === post.user._id;
+	// ? Check If Post Is Owned By Authenticated User ? \\
 
 	const formattedDate : string = "1h";
 
@@ -68,7 +114,9 @@ const Post = ({post} : PostProps) => {
 
 
 	// ? Handle Delete Post ?\\
-	const HandleDeletePost = () => {};
+	const HandleDeletePost = () => {
+		deletePost();
+	};
 	// ? Handle Delete Post\\
 
 
@@ -106,7 +154,8 @@ const Post = ({post} : PostProps) => {
 						</span>
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>
-								<FaTrash className='cursor-pointer hover:text-red-500' onClick={HandleDeletePost} />
+								{!isPending && <FaTrash className='cursor-pointer hover:text-red-500' onClick={HandleDeletePost} />}
+								{isPending && (<LoadingSpinner size='md' />)}
 							</span>
 						)}
 					</div>

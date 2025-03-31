@@ -12,8 +12,8 @@ PostRoutes.get("/likes/:id", ProtectedRoute, GetLikedPosts);
 PostRoutes.get("/user/:username", ProtectedRoute, GetUserPosts);
 PostRoutes.post("/createPost", ProtectedRoute, CreatePost);
 PostRoutes.post("/like/:id", ProtectedRoute, LikeUnlikePost);
-PostRoutes.post("/comment/:id", ProtectedRoute, CommentOnPost);
-PostRoutes.delete("/:id", ProtectedRoute, DeletePost);
+PostRoutes.post("/commentOnPost/:id", ProtectedRoute, CommentOnPost);
+PostRoutes.delete("deletePost/:id", ProtectedRoute, DeletePost);
 
 
 
