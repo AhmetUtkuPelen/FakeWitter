@@ -1,10 +1,44 @@
 import { Link } from "react-router";
-import { USERS_FOR_RIGHT_PANEL } from "../../Utility/DataBase/DummyDataBase";
 import RightPanelSkeleton from "../Skeletons/RightPanelSkeleton";
 import PlaceHolderImg from "../../assets/avatar-placeholder.png";
+import { useQuery } from "@tanstack/react-query";
+import FollowHook from "../../Hooks/FollowHook";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 
 const RightPanel = () => {
+
+
+
+	const {data:GetSuggestedUsers,isLoading} = useQuery({
+		queryKey:["suggestedUsers"],
+		queryFn : async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/suggestedUsers`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+
+				const data = await response.json();
+
+				if(!response.ok){
+					throw new Error(data.error || "Something Went Wrong Getting Suggested Users !");
+				}
+				
+				return data;
+			
+			} catch (error) {
+				if(error instanceof Error){
+					console.log(error.message);
+				}
+			}
+		},
+		retry: false,
+	})
+
 
 
 	// ? Users For Right Panel Interface ? \\
@@ -16,7 +50,21 @@ const RightPanel = () => {
 	}
 
 
-    const isLoading : boolean = false;
+
+	// ? Follow Hook That Comes From FollowHook.tsx ? \\
+	const {followUser,isPending} = FollowHook();
+	// ? Follow Hook That Comes From FollowHook.tsx ? \\
+
+
+
+
+	if(GetSuggestedUsers?.length === 0){
+		return (
+			<div className="md:w-64 w-0"></div>
+		);
+	}
+
+
 
 	return (
 		<div className='hidden lg:block my-4 mx-2'>
@@ -33,7 +81,7 @@ const RightPanel = () => {
 						</>
 					)}
 					{!isLoading &&
-						USERS_FOR_RIGHT_PANEL?.map((user:UserForRightPanel) => (
+						GetSuggestedUsers?.map((user:UserForRightPanel) => (
 							<Link
 								to={`/profile/${user?.username}`}
 								className='flex items-center justify-between gap-4'
@@ -55,9 +103,9 @@ const RightPanel = () => {
 								<div>
 									<button
 										className='btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm'
-										onClick={(e: React.MouseEvent) => e.preventDefault()}
+										onClick={(e: React.MouseEvent) => {e.preventDefault();followUser(user._id);}}
 									>
-										Follow
+										{isPending ? <LoadingSpinner size="md"/> : "FOLLOW"}
 									</button>
 								</div>
 							</Link>
