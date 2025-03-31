@@ -3,10 +3,16 @@ import Post from "../../Components/Post/Post";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+interface PostsProps {
+  contentType: string;
+  username?: string;
+  userId?: string;
+}
 
-const Posts = ({contentType}:{contentType:string}) => {
+const Posts = ({ contentType, username, userId }: PostsProps) => {
 
 
+	
 	// ? Get Content Types ? \\
 	const GetContentTypes = () => {
 		switch (contentType) {
@@ -14,8 +20,12 @@ const Posts = ({contentType}:{contentType:string}) => {
 				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/allPosts`;
 			case "following":
 				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/followingPosts`;
+			case "posts":
+				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/userPosts/${username}`;
+			case "likes":
+				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/likes/${userId}`;
 			default:
-				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/allPosts}`;
+				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/allPosts`;
 		}
 	}
 	// ? Get Content Types ? \\
@@ -72,6 +82,7 @@ const Posts = ({contentType}:{contentType:string}) => {
 			};
 		}[];
 		likes: string[];
+		createdAt: Date;
 	}
 	// ? Post Interface ? \\
 

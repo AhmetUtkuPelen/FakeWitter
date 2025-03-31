@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -8,9 +8,11 @@ import { MdEdit } from "react-icons/md";
 import Posts from "../Posts/Posts";
 import { POSTS } from "../../Utility/DataBase/DummyDataBase";
 import ProfileHeaderSkeleton from "../../Components/Skeletons/ProfileHeaderSkeleton";
-import Boy2 from "../../assets/avatars/boy2.png"
 import CoverImg from "../../assets/cover.png"
 import PlaceHolderImg from "../../assets/avatar-placeholder.png"
+import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { FormatMemberSinceDate } from "../../Utility/GetDateUtility/GetDateUtility";
 
 
 const ProfilePage = () => {
@@ -24,6 +26,7 @@ const ProfilePage = () => {
 		coverImg?: string;
 		bio: string;
 		link: string;
+		createdAt: Date;
 		following: string[];
 		followers: string[];
 	}
@@ -33,27 +36,50 @@ const ProfilePage = () => {
 
 	const [coverImg, setCoverImg] = useState<string | null>(null);
 	const [profileImg, setProfileImg] = useState<string | null>(null);
-	const [feedType, setFeedType] = useState<"posts" | "likes">("posts");
+	const [contentType, setContentType] = useState<"posts" | "likes">("posts");
+
+	const {username} = useParams();
 
 	const coverImgRef = useRef<HTMLInputElement>(null);
 	const profileImgRef = useRef<HTMLInputElement>(null);
 
-	const isLoading : boolean = false;
 	const isMyProfile : boolean = true;
 
-	// ? User Data ? \\
-	const user : User = {
-		_id: "1",
-		fullName: "John Doe",
-		username: "johndoe",
-		profileImg: Boy2,
-		coverImg: CoverImg,
-		bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-		link: "https://youtube.com/@asaprogrammer_",
-		following: ["1", "2", "3"],
-		followers: ["1", "2", "3"],
-	};
-	// ? User Data ? \\
+	const {data:user,isLoading,refetch,isRefetching} = useQuery<User | null>({
+		queryKey:["user"],
+		queryFn : async () => {
+			try {
+
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${username}`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+				
+				const data = await response.json();
+				
+				if(!response.ok){
+					throw new Error(data?.error || "Something Went Wrong Getting User !");
+				}
+
+				return data;
+
+			} catch (error) {
+				if(error instanceof Error){
+					toast.error(error.message);
+				}
+			}
+		}
+	})
+
+
+
+	// ? Get Member Since Date ? \\
+	const SinceMemberDate = user?.createdAt ? FormatMemberSinceDate(user.createdAt) : '';
+	// ? Get Member Since Date ? \\
+
 
 
 	// ? Handle Image Change ? \\
@@ -72,14 +98,20 @@ const ProfilePage = () => {
 
 
 
+	useEffect(() => {
+		refetch();
+	},[username,refetch])
+
+
+
 	return (
 		<>
 			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
 				{/* HEADER */}
-				{isLoading && <ProfileHeaderSkeleton />}
-				{!isLoading && !user && <p className='text-center text-lg mt-4'>User Not Found</p>}
+				{(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
+				{!isLoading && !isRefetching && !user && <p className='text-center text-lg mt-4'>User Not Found !</p>}
 				<div className='flex flex-col'>
-					{!isLoading && user && (
+					{!isLoading && !isRefetching && user && (
 						<>
 							<div className='flex gap-10 px-4 py-2 items-center'>
 								<Link to='/'>
@@ -180,7 +212,9 @@ const ProfilePage = () => {
 									)}
 									<div className='flex gap-2 items-center'>
 										<IoCalendarOutline className='w-4 h-4 text-slate-500' />
-										<span className='text-sm text-slate-500'>Joined July 2021</span>
+										<span className='text-sm text-slate-500'>
+											{SinceMemberDate}
+										</span>
 									</div>
 								</div>
 								<div className='flex gap-2'>
@@ -197,19 +231,19 @@ const ProfilePage = () => {
 							<div className='flex w-full border-b border-gray-700 mt-4'>
 								<div
 									className='flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer'
-									onClick={() => setFeedType("posts")}
+									onClick={() => setContentType("posts")}
 								>
 									Posts
-									{feedType === "posts" && (
+									{contentType === "posts" && (
 										<div className='absolute bottom-0 w-10 h-1 rounded-full bg-primary' />
 									)}
 								</div>
 								<div
 									className='flex justify-center flex-1 p-3 text-slate-500 hover:bg-secondary transition duration-300 relative cursor-pointer'
-									onClick={() => setFeedType("likes")}
+									onClick={() => setContentType("likes")}
 								>
 									Likes
-									{feedType === "likes" && (
+									{contentType === "likes" && (
 										<div className='absolute bottom-0 w-10  h-1 rounded-full bg-primary' />
 									)}
 								</div>
@@ -217,7 +251,7 @@ const ProfilePage = () => {
 						</>
 					)}
 
-					<Posts />
+					<Posts contentType={contentType} username={username} userId={user?._id} />
 				</div>
 			</div>
 		</>

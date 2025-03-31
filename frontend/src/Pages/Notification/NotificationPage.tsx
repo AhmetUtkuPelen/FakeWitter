@@ -3,10 +3,9 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
-import Boy2Img from "../../assets/avatars/boy2.png"
-import Girl1Img from "../../assets/avatars/girl1.png"
 import PlaceHolderImg from "../../assets/avatar-placeholder.png"
-
+import { useQuery,useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 // ? Notification Interface ? \\
 interface Notification {
@@ -26,35 +25,85 @@ interface Notification {
 const NotificationPage = () => {
 
 
-	const isLoading : boolean = false;
+
+	const queryClient = useQueryClient();
+
+
+
+	const {data:notifications,isLoading} = useQuery({
+		queryKey:["notifications"],
+		queryFn : async () => {
+			try {
+				
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notifications/getNotifications`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+
+				const data = await response.json();
+
+				if(!response.ok){
+					throw new Error(data.error || "Something Went Wrong Getting Notifications !");
+				}
+				
+				return data;
+
+			} catch (error) {
+				if(error instanceof Error){
+					console.log(error.message);
+				}
+			}
+		},
+		retry: false,
+	})
 	
 
-	const notifications : Notification[] = [
-		{
-			_id: "1",
-			from: {
-				_id: "1",
-				username: "johndoe",
-				profileImg: Boy2Img,
-			},
-			type: "follow",
+
+	const {mutate:deleteNotifications} = useMutation({
+		mutationFn : async () => {
+			try {
+				
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notifications/deleteNotifications`, {
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+
+				const data = await response.json();
+
+				if(!response.ok){
+					throw new Error(data.error || "Something Went Wrong Deleting Notifications !");
+				}
+				
+				return data;
+
+			} catch (error) {
+				if(error instanceof Error){
+					console.log(error.message);
+				}
+			}
 		},
-		{
-			_id: "2",
-			from: {
-				_id: "2",
-				username: "janedoe",
-				profileImg: Girl1Img,
-			},
-			type: "like",
+		onSuccess : () => {
+			queryClient.invalidateQueries({queryKey : ["notifications"]});
+			toast.success("Notifications Deleted Successfully !");
 		},
-	];
+		onError : (error:Error) => {
+			toast.error(error?.message || "Something Went Wrong Deleting Notifications !");
+		}
+	})
 
 
 
 	// ? Delete Notifications ? \\
 	const DeleteNotifications = () => {
-		alert("All notifications deleted");
+		deleteNotifications();
+		toast.success("Notifications Deleted Successfully !");
+		queryClient.invalidateQueries({queryKey : ["notifications"]});
 	};
 	// ? Delete Notifications ? \\
 
