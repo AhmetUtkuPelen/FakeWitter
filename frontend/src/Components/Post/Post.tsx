@@ -9,6 +9,7 @@ import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
+import { FormatPostDate } from "../../Utility/GetDateUtility/GetDateUtility";
 
 
 
@@ -34,6 +35,7 @@ interface PostProps {
 			};
 		}[];
 		likes: any[];
+		createdAt: Date;
 	};
 }
 	// ? Post Interface ? \\
@@ -56,20 +58,38 @@ interface PostProps {
 		text: string;
 		user: User;
 	}
+	// ? Comment Interface ? \\
 
 
 
 const Post = ({post} : PostProps) => {
 	
+
 	const [comment, setComment] = useState<string>("");
 
 	const {data:authUser} = useQuery<User | null>({queryKey:["authenticatedUser"]});
 
-	// ? Delete Post Query ? \\
-	const queryDeleteClient = useQueryClient();
-	// ? Delete Post Query ? \\
+	const postOwner : User = post.user;
+	const isLiked : boolean = post.likes.includes(authUser?._id);
 
-	const {mutate:deletePost,isPending} = useMutation({
+
+
+	// ? Check If Post Is Owned By Authenticated User ? \\
+	const isMyPost : boolean = authUser?._id === post.user._id;
+	// ? Check If Post Is Owned By Authenticated User ? \\
+
+
+	const formattedDate: string = FormatPostDate(post.createdAt);
+
+
+	// ? Delete Post Query CLient ? \\
+	const queryDeleteClient = useQueryClient();
+	// ? Delete Post Query CLient ? \\
+
+
+
+	// ? Delete Post Query ? \\
+	const {mutate:deletePost,isPending:isDeletingPost} = useMutation({
 		mutationFn : async () => {
 			try {
 				const response = await fetch(`import.meta.env.VITE_BACKEND_URL}/api/posts/deletePost/${post._id}`, {
@@ -94,24 +114,97 @@ const Post = ({post} : PostProps) => {
 				}
 			}
 		},
-		onSuccess : () => {
+		onSuccess: () => {
 			toast.success("Post Deleted Successfully !");
-			queryDeleteClient.invalidateQueries({queryKey : ["posts"]});
+			queryDeleteClient.setQueryData(["posts"], (oldData: any) => {
+				return oldData.filter((p: PostProps['post']) => p._id !== post._id);
+			})
 		}
 
 	})
+	// ? Delete Post Query ? \\
 
-	const postOwner : User = post.user;
-	const isLiked : boolean = false;
+	
 
-	// ? Check If Post Is Owned By Authenticated User ? \\
-	const isMyPost : boolean = authUser?._id === post.user._id;
-	// ? Check If Post Is Owned By Authenticated User ? \\
+	// ? Like Post Query ? \\
+	const {mutate:LikePost,isPending:isPendingLikePost} = useMutation({
+		mutationFn : async () => {
+			try {
+				
+				const response = await fetch(`import.meta.env.VITE_BACKEND_URL}/api/posts/like/${post._id}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
 
-	const formattedDate : string = "1h";
+				const data = await response.json();
 
-	const isCommenting : boolean = false;
+				if(!response.ok){
+					throw new Error(data.error || "Something Went Wrong Liking Post !");
+				}
+				
+				return data;
 
+			} catch (error) {
+				if(error instanceof Error){
+					console.log(error.message);
+				}
+			}
+		},
+		onSuccess : () => {
+			queryDeleteClient.invalidateQueries({queryKey : ["posts"]});
+			toast.success("Post Liked Successfully !");
+		},
+		onError : () => {
+			toast.error("Something Went Wrong Liking Post !");
+		}
+	})
+	// ? Like Post Query ? \\
+
+
+
+	// ? Comment Post Query ? \\
+	const {mutate:CommentOnPost,isPending:isCommenting} = useMutation({
+		mutationFn : async () => {
+			try {
+				
+				const response = await fetch(`import.meta.env.VITE_BACKEND_URL}/api/posts/commentOnPost/${post._id}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({text : comment}),
+					credentials: "include"
+				}
+				);
+
+				const data = await response.json();
+
+				if(!response.ok){
+					throw new Error(data.error || "Something Went Wrong Commenting !");
+				}
+				
+				return data;
+
+			} catch (error) {
+				if(error instanceof Error){
+					console.log(error.message);
+				}
+			}
+		},
+		onSuccess : () => {
+			toast.success("Commented Successfully !");
+			setComment("");
+			queryDeleteClient.invalidateQueries({queryKey : ["posts"]});
+		},
+		onError : () => {
+			toast.error("Something Went Wrong Commenting !");
+		}
+	});
+	// ? Comment Post Query ? \\
+	
 
 	// ? Handle Delete Post ?\\
 	const HandleDeletePost = () => {
@@ -124,13 +217,19 @@ const Post = ({post} : PostProps) => {
 	// ? Handle Post Comment ?\\
 	const HandlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		if(isCommenting) return;
+		CommentOnPost();
+		setComment("");
 	};
 	// ? Handle Post Comment\\
 
 
 
 	// ? Handle Like Post ?\\
-	const HandleLikePost = () => {};
+	const HandleLikePost = () => {
+		if(isPendingLikePost) return;
+		LikePost();
+	};
 	// ? Handle Like Post ?\\
 
 
@@ -154,8 +253,8 @@ const Post = ({post} : PostProps) => {
 						</span>
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>
-								{!isPending && <FaTrash className='cursor-pointer hover:text-red-500' onClick={HandleDeletePost} />}
-								{isPending && (<LoadingSpinner size='md' />)}
+								{!isDeletingPost && <FaTrash className='cursor-pointer hover:text-red-500' onClick={HandleDeletePost} />}
+								{isDeletingPost && (<LoadingSpinner size='md' />)}
 							</span>
 						)}
 					</div>
@@ -226,7 +325,7 @@ const Post = ({post} : PostProps) => {
 										/>
 										<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
 											{isCommenting ? (
-												<span className='loading loading-spinner loading-md'></span>
+												<LoadingSpinner size='md' />
 											) : (
 												"Post"
 											)}
@@ -242,14 +341,15 @@ const Post = ({post} : PostProps) => {
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div>
 							<div className='flex gap-1 items-center group cursor-pointer' onClick={HandleLikePost}>
-								{!isLiked && (
+								{isPendingLikePost && <LoadingSpinner size='md' />}
+								{!isLiked && !isPendingLikePost && (
 									<FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />
 								)}
-								{isLiked && <FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
+								{isLiked && !isPendingLikePost && <FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
 
 								<span
-									className={`text-sm text-slate-500 group-hover:text-pink-500 ${
-										isLiked ? "text-pink-500" : ""
+									className={`text-sm group-hover:text-pink-500 ${
+										isLiked ? "text-pink-500" : "text-slate-500"
 									}`}
 								>
 									{post.likes.length}
