@@ -1,6 +1,27 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-const EditProfileModal = () => {
+
+interface User {
+	_id: string;
+	fullName: string;
+	username: string;
+	email: string;
+	profileImg?: string;
+	coverImg?: string;
+	bio: string;
+	link: string;
+	createdAt: Date;
+	following: string[];
+	followers: string[];
+}
+
+
+const EditProfileModal = ({authUser} : {authUser : User | null}) => {
+
+
+
 
 	// ? Form Data Interface ? \\
 	interface FormData {
@@ -12,6 +33,7 @@ const EditProfileModal = () => {
 		newPassword: string;
 		currentPassword: string;
 	}
+	// ? Form Data Interface ? \\
 
 
 
@@ -26,11 +48,75 @@ const EditProfileModal = () => {
 	});
 
 
+
+	// ? Query Client ? \\
+	const queryClient = useQueryClient();
+	// ? Query Client ? \\
+
+
+
+	const {mutate:UpdateProfile,isPending:IsUpdatingProfile} = useMutation({
+		mutationFn : async () => {
+			try {
+				
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/updateProfile}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(formData),
+					credentials: "include"
+				});
+
+				const data = await response.json();
+
+				if(!response.ok){
+					throw new Error(data.error || "Something Went Wrong Updating Profile !");
+				}
+				
+				return data;
+
+			} catch (error) {
+				if(error instanceof Error){
+					toast.error(error.message);
+				}
+			}
+		},
+		onSuccess : () => {
+			toast.success("Profile Updated Successfully !");
+			Promise.all([
+				queryClient.invalidateQueries({queryKey : ["authenticatedUser"]}),
+				queryClient.invalidateQueries({queryKey : ["userProfile"]})
+			])
+		},
+		onError : (error:Error) => {
+			toast.error(error.message || "Something Went Wrong Updating Profile !");
+		}
+	})
+
+
+
 	// ? Handle Input Change ? \\
 	const HandleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 	// ? Handle Input Change ? \\
+
+
+
+	useEffect(() => {
+		if(authUser){
+			setFormData({
+				fullName: authUser.fullName,
+				username: authUser.username,
+				email: authUser.email,
+				bio: authUser.bio,
+				link: authUser.link,
+				newPassword: "",
+				currentPassword: "",
+			});
+		}
+	},[authUser]);
 
 
 
@@ -52,7 +138,7 @@ const EditProfileModal = () => {
 						className='flex flex-col gap-4'
 						onSubmit={(e) => {
 							e.preventDefault();
-							alert("Profile updated successfully");
+							UpdateProfile();
 						}}
 					>
 						<div className='flex flex-wrap gap-2'>
@@ -116,7 +202,9 @@ const EditProfileModal = () => {
 							name='link'
 							onChange={HandleInputChange}
 						/>
-						<button className='btn btn-primary rounded-full btn-sm text-white'>Update</button>
+						<button className='btn btn-primary rounded-full btn-sm text-white'>
+							{IsUpdatingProfile ? "UPDATING..." : "UPDATE"}
+						</button>
 					</form>
 				</div>
 				<form method='dialog' className='modal-backdrop'>
