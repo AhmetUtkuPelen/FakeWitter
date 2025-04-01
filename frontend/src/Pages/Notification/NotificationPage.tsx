@@ -7,6 +7,8 @@ import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 import { useQuery,useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+
+
 // ? Notification Interface ? \\
 interface Notification {
   _id: string;
@@ -29,7 +31,7 @@ const NotificationPage = () => {
 	const queryClient = useQueryClient();
 
 
-
+	// ? Get Notifications ? \\
 	const {data:notifications,isLoading} = useQuery({
 		queryKey:["notifications"],
 		queryFn : async () => {
@@ -67,9 +69,11 @@ const NotificationPage = () => {
 		},
 		retry: false,
 	})
+	// ? Get Notifications ? \\
 	
 
 
+	// ? Delete Notifications ? \\
 	const {mutate:deleteNotifications} = useMutation({
 		mutationFn : async () => {
 			try {
@@ -112,6 +116,7 @@ const NotificationPage = () => {
 			toast.error(error?.message || "Something Went Wrong Deleting Notifications !");
 		}
 	})
+	// ? Delete Notifications ? \\
 
 
 
@@ -149,7 +154,7 @@ const NotificationPage = () => {
 						<LoadingSpinner size='lg' />
 					</div>
 				)}
-				{notifications?.length === 0 && <div className='text-center p-4 font-bold'>No notifications 🤔</div>}
+				{notifications?.length === 0 && <div className='text-center p-4 font-bold'>No Notifications Yet!</div>}
 				{notifications?.map((notification: Notification) => (
 					<div className='border-b border-gray-700' key={notification._id}>
 						<div className='flex gap-2 p-4'>

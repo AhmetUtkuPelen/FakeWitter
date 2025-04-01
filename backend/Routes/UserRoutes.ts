@@ -1,6 +1,6 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { ProtectedRoute } from '../Middlewares/ProtectedRoute';
-import { FollowOrUnfollowAUser, GetUserProfile, GetUserSuggestions,UpdateUser } from '../Controllers/UserControllers';
+import { FollowOrUnfollowAUser, GetUserProfile, GetUsersByIds, GetUserSuggestions,UpdateUser } from '../Controllers/UserControllers';
 
 
 
@@ -12,6 +12,7 @@ UserRoutes.get('/profile/:username',ProtectedRoute,GetUserProfile)
 UserRoutes.get('/suggestedUsers',ProtectedRoute,GetUserSuggestions)
 UserRoutes.post('/followUser/:id',ProtectedRoute,FollowOrUnfollowAUser)
 UserRoutes.post('/updateProfile',ProtectedRoute,UpdateUser)
+UserRoutes.post('/getUsersByIds',ProtectedRoute,GetUsersByIds);
 
 
 

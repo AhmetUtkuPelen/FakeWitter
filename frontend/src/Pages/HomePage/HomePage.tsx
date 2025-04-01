@@ -7,7 +7,11 @@ import CreatePost from "../CreatePost/CreatePost";
 const HomePage = () => {
 
 
+
+	// ? State To Get Content Type ? \\
 	const [contentType, setContentType] = useState("forYou");
+	// ? State To Get Content Type ? \\
+
 
 	
 	return (
@@ -37,10 +41,10 @@ const HomePage = () => {
 					</div>
 				</div>
 
-				{/*  CREATE POST INPUT */}
+				{/* ?  CREATE POST INPUT ? */}
 				<CreatePost />
 
-				{/* POSTS */}
+				{/* ? POSTS ? */}
 				<Posts contentType={contentType} />
 			</div>
 		</>

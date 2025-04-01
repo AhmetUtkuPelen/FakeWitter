@@ -17,6 +17,9 @@ interface IUser extends Document {
   following: string[];
   likedPosts: string[];
 }
+// ? Define User interface based on your UserModel ? \\
+
+
 
 // ? Extend the Express Request interface ? \\
 declare global {

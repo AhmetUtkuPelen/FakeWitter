@@ -29,7 +29,7 @@ function App() {
           credentials: "include"
         });
 
-        // If we get a 401, it means user is not logged in - this is expected
+        // ? If we get a 401, it means user is not logged in - this is expected ? \\
         if (response.status === 401) {
           return null;
         }
@@ -45,8 +45,6 @@ function App() {
       } catch (error) {
         if(error instanceof Error){
           console.error("Auth error:", error);
-          // Don't show error toast for auth issues - it's normal for users to be logged out
-          // toast.error(error.message);
         }
         return null;
       }
@@ -56,7 +54,7 @@ function App() {
   // ? Get Authenticated User Query ? \\
 
 
-
+  // ? Loading ? \\
   if(isLoading){
     return (
       <div className="h-screen flex justify-center items-center">
@@ -64,11 +62,14 @@ function App() {
       </div>
     )
   }
+  // ? Loading ? \\
+
 
 
 
   return (
     <div className="flex max-w-6xl mx-auto">
+      {/* ? Show SideBar If User Is Authenticated ? */}
       {authenticatedUser && <SideBar/>}
       <Routes>
         <Route path='/' element={authenticatedUser ? <HomePage /> : <Navigate to='/login' />} />
@@ -76,6 +77,7 @@ function App() {
 				<Route path='/login' element={!authenticatedUser ? <LoginPage /> : <Navigate to='/' />} />
 				<Route path='/notifications' element={authenticatedUser ? <NotificationPage /> : <Navigate to='/login' />} />
 				<Route path='/profile/:username' element={authenticatedUser ? <ProfilePage /> : <Navigate to='/login' />} />
+        {/* ? Show RightPanel If User Is Authenticated ? */}
       </Routes>
       {authenticatedUser && <RightPanel/>}
       <Toaster/>

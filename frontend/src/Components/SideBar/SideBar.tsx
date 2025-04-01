@@ -8,6 +8,8 @@ import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+
+// ? User Interface ? \\
 interface IUser {
     _id: string;
     username: string;
@@ -23,6 +25,9 @@ interface IUser {
 	email: string;
 	updatedAt: Date;
 }
+// ? User Interface ? \\
+
+
 
 const SideBar = () => {
 
@@ -33,6 +38,7 @@ const SideBar = () => {
 
 
 
+	// ? Log Out Mutation ? \\
 	const {mutate:LogOut} = useMutation({
 		mutationFn : async () => {
 			try {
@@ -66,6 +72,8 @@ const SideBar = () => {
 			toast.error(error instanceof Error ? error.message : "Something Went Wrong Logging Out!");
 		}
 	})
+	// ? Log Out Mutation ? \\
+
 
 
 	// ? Get Authenticated User Query ? \\
@@ -84,7 +92,7 @@ const SideBar = () => {
 				const data = await response.json();
 				
 				if(!response.ok){
-					// If we get a 401 Unauthorized, it's normal after logout
+					// ? If we get a 401 Unauthorized, it's normal after logout ? \\
 					if(response.status === 401) {
 						return null;
 					}
@@ -94,11 +102,9 @@ const SideBar = () => {
 				return data;
 			} catch (error) {
 				console.error("Error fetching user:", error);
-				// Don't throw the error, just return null to prevent UI issues
 				return null;
 			}
 		},
-		// Don't retry on 401 errors (which happen after logout)
 		retry: (failureCount, error) => {
 			if (error instanceof Error && error.message.includes("401")) {
 				return false;

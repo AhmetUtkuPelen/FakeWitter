@@ -79,7 +79,7 @@ const Post = ({post} : PostProps) => {
 					credentials: "include"
 				});
 				
-				// If we get a 401, it means user is not logged in - this is expected
+				// ? If we get a 401, it means user is not logged in - this is expected ? \\
 				if (response.status === 401) {
 					return null;
 				}
@@ -98,17 +98,35 @@ const Post = ({post} : PostProps) => {
 		}
 	});
 
-	const postOwner : User = post.user;
-	const isLiked : boolean = post.likes.includes(authUser?._id);
+	// ? Get Post Owner ? \\
+	const postOwner : User = post.user || {
+		_id: '',
+		username: '',
+		fullName: '',
+		profileImg: ''
+	};
+	// ? Get Post Owner ? \\
+
+
+
+	// ? Check If Post Is Liked By Authenticated User ? \\
+	const isLiked : boolean = authUser && authUser._id && post.likes ? 
+		post.likes.some(id => id === authUser._id) : false;
+	// ? Check If Post Is Liked By Authenticated User ? \\
 
 
 
 	// ? Check If Post Is Owned By Authenticated User ? \\
-	const isMyPost : boolean = authUser?._id === post.user._id;
+	const isMyPost : boolean = authUser && authUser._id && post.user ? 
+		authUser._id === post.user._id : false;
 	// ? Check If Post Is Owned By Authenticated User ? \\
 
 
+
+	// ? Format Post Date ? \\
 	const formattedDate: string = FormatPostDate(post.createdAt);
+	// ? Format Post Date ? \\
+
 
 
 	// ? Delete Post Query CLient ? \\
@@ -129,7 +147,6 @@ const Post = ({post} : PostProps) => {
 					credentials: "include"
 				});
 
-				// Check if response is OK before trying to parse JSON
 				if (!response.ok) {
 					const errorText = await response.text();
 					console.error("Error response:", errorText);
@@ -142,7 +159,7 @@ const Post = ({post} : PostProps) => {
 			} catch (error) {
 				if(error instanceof Error){
 					console.log(error.message);
-					throw error; // Re-throw to trigger onError
+					throw error;
 				}
 			}
 		},
@@ -174,7 +191,6 @@ const Post = ({post} : PostProps) => {
 					credentials: "include"
 				});
 
-				// Check if response is OK before trying to parse JSON
 				if (!response.ok) {
 					const errorText = await response.text();
 					console.error("Error response:", errorText);
@@ -217,7 +233,6 @@ const Post = ({post} : PostProps) => {
 					credentials: "include"
 				});
 
-				// Check if response is OK before trying to parse JSON
 				if (!response.ok) {
 					const errorText = await response.text();
 					console.error("Error response:", errorText);
@@ -258,7 +273,7 @@ const Post = ({post} : PostProps) => {
 	const HandlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		
-		// Validate comment before submitting
+		// ? Validate comment before submitting ? \\
 		if (!comment.trim()) {
 			toast.error("You need to write something in your comment!");
 			return;
@@ -283,17 +298,17 @@ const Post = ({post} : PostProps) => {
 		<>
 			<div className='flex gap-2 items-start p-4 border-b border-gray-700'>
 				<div className='avatar'>
-					<Link to={`/profile/${postOwner.username}`} className='w-8 rounded-full overflow-hidden'>
-						<img src={postOwner.profileImg || PlaceHolderImg} />
+					<Link to={`/profile/${postOwner?.username || ''}`} className='w-8 rounded-full overflow-hidden'>
+						<img src={postOwner?.profileImg || PlaceHolderImg} />
 					</Link>
 				</div>
 				<div className='flex flex-col flex-1'>
 					<div className='flex gap-2 items-center'>
-						<Link to={`/profile/${postOwner.username}`} className='font-bold'>
-							{postOwner.fullName}
+						<Link to={`/profile/${postOwner?.username || ''}`} className='font-bold'>
+							{postOwner?.fullName || 'Unknown User'}
 						</Link>
 						<span className='text-gray-700 flex gap-1 text-sm'>
-							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
+							<Link to={`/profile/${postOwner?.username || ''}`}>@{postOwner?.username || 'unknown'}</Link>
 							<span>·</span>
 							<span>{formattedDate}</span>
 						</span>
@@ -343,15 +358,16 @@ const Post = ({post} : PostProps) => {
 												<div className='avatar'>
 													<div className='w-8 rounded-full'>
 														<img
-															src={comment.user.profileImg || "/avatar-placeholder.png"}
+															src={(comment.user && comment.user.profileImg) || PlaceHolderImg}
+															alt={comment.user ? comment.user.username : "User"}
 														/>
 													</div>
 												</div>
 												<div className='flex flex-col'>
 													<div className='flex items-center gap-1'>
-														<span className='font-bold'>{comment.user.fullName}</span>
+														<span className='font-bold'>{comment.user ? comment.user.fullName : "Unknown User"}</span>
 														<span className='text-gray-700 text-sm'>
-															@{comment.user.username}
+															@{comment.user ? comment.user.username : "unknown"}
 														</span>
 													</div>
 													<div className='text-sm'>{comment.text}</div>

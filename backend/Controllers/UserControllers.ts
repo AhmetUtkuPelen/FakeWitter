@@ -5,6 +5,8 @@ import bcryptjs from 'bcryptjs';
 import Cloudinary from '../Cloudinary/Cloudinary';
 import { IUser } from '../Models/UserModel';
 
+
+
 // ? GET USER PROFILE ? \\
 export const GetUserProfile = async (req: Request, res: Response) => {
 
@@ -103,8 +105,6 @@ export const FollowOrUnfollowAUser = async (req: Request, res: Response) => {
             // ? if you are already following , unfollow user ? \\
             await User.findByIdAndUpdate(id, { $pull: { followers: req.user?._id } });
             await User.findByIdAndUpdate(req.user?._id, { $pull: { following: id } });
-
-            // ? TODO => return the id of the user as a response ? \\
 
             res.status(200).json({ message: "User Unfollowed Successfully !" });
         
@@ -244,3 +244,23 @@ export const UpdateUser = async (req: Request, res: Response) => {
 
 }
 // ? UPDATE USER ? \\
+
+
+
+
+export const GetUsersByIds = async (req: Request, res: Response) => {
+
+    try {
+      const { userIds } = req.body;
+
+      const users = await User.find({ _id: { $in: userIds } }).select('_id fullName username profileImg');
+      
+      res.status(200).json(users);
+    
+    } catch (error) {
+        if(error instanceof Error){
+            res.status(500).json({ error: error.message });
+            console.log(error);
+        }
+    }
+  }

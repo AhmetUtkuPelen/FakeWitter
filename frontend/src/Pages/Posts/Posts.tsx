@@ -3,11 +3,16 @@ import Post from "../../Components/Post/Post";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+
+// ? Posts Props Interface ? \\
 interface PostsProps {
   contentType: string;
   username?: string;
   userId?: string;
 }
+// ? Posts Props Interface ? \\
+
+
 
 const Posts = ({ contentType, username, userId }: PostsProps) => {
 
@@ -38,6 +43,7 @@ const Posts = ({ contentType, username, userId }: PostsProps) => {
 
 
 
+	// ? Get Posts ? \\
 	const {data:posts,isLoading,refetch,isRefetching} = useQuery({
 		queryKey : ["posts"],
 		queryFn : async () => {
@@ -73,6 +79,8 @@ const Posts = ({ contentType, username, userId }: PostsProps) => {
 			}
 		}
 	})
+	// ? Get Posts ? \\
+
 
 
 
@@ -102,7 +110,7 @@ const Posts = ({ contentType, username, userId }: PostsProps) => {
 	// ? Post Interface ? \\
 
 
-
+	
 	useEffect(() => {
 		refetch();
 	},[contentType,refetch])

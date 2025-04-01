@@ -1,3 +1,4 @@
+// ? Format Post Date ? \\
 export const FormatPostDate = (createdAt: Date) => {
 
 	const currentDate = new Date();
@@ -20,8 +21,11 @@ export const FormatPostDate = (createdAt: Date) => {
 		return "Just now";
 	}
 };
+// ? Format Post Date ? \\
 
 
+
+// ? Format Member Since Date ? \\
 export const FormatMemberSinceDate = (createdAt:Date) => {
 
     const date = new Date(createdAt);
@@ -48,3 +52,4 @@ export const FormatMemberSinceDate = (createdAt:Date) => {
     return `Joined ${month} ${year}`;
 
 };
+// ? Format Member Since Date ? \\

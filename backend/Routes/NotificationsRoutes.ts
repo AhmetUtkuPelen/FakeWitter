@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { ProtectedRoute } from '../Middlewares/ProtectedRoute';
 import { GetNotifications,DeleteNotifications,DeleteNotification } from '../Controllers/NotificationControllers';
 

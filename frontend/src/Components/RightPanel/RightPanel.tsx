@@ -9,7 +9,7 @@ import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 const RightPanel = () => {
 
 
-
+	// ? Get Suggested Users Query ? \\
 	const {data:GetSuggestedUsers,isLoading} = useQuery({
 		queryKey:["suggestedUsers"],
 		queryFn : async () => {
@@ -38,6 +38,7 @@ const RightPanel = () => {
 		},
 		retry: false,
 	})
+	// ? Get Suggested Users Query ? \\
 
 
 
@@ -48,6 +49,7 @@ const RightPanel = () => {
 		username: string;
 		profileImg?: string;
 	}
+	// ? Users For Right Panel Interface ? \\
 
 
 
@@ -57,12 +59,14 @@ const RightPanel = () => {
 
 
 
-
+	// ? If There Are No Suggested Users, Don't Render The Right Panel ? \\
 	if(GetSuggestedUsers?.length === 0){
 		return (
 			<div className="md:w-64 w-0"></div>
 		);
 	}
+	// ? If There Are No Suggested Users, Don't Render The Right Panel ? \\
+
 
 
 
@@ -71,7 +75,7 @@ const RightPanel = () => {
 			<div className='bg-[#16181C] p-4 rounded-md sticky top-2'>
 				<p className='font-bold'>Who to follow</p>
 				<div className='flex flex-col gap-4'>
-					{/* item */}
+					{/* ? item ? */}
 					{isLoading && (
 						<>
 							<RightPanelSkeleton />

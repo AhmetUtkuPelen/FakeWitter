@@ -5,10 +5,18 @@ import { IoCloseSharp } from "react-icons/io5";
 import PlaceHolderImg from "../../assets/avatar-placeholder.png"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-
+import EmojiPicker from 'emoji-picker-react';
 
 const CreatePost = () => {
 
+	// ? Add state for emoji picker visibility ?
+	const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
+	
+	// ? Add function to handle emoji selection ? \\
+	const handleEmojiClick = (emojiData: any) => {
+		setText(prevText => prevText + emojiData.emoji);
+		setShowEmojiPicker(false);
+	};
 
 	// ? User Interface To Create Post ? \\
 	interface CreatePostUser {
@@ -21,11 +29,17 @@ const CreatePost = () => {
 
 
 
+	// ? State To Create Post ? \\
 	const [text, setText] = useState<string>("");
 	const [img, setImg] = useState<string | null>(null);
+	// ? State To Create Post ? \\
+
 
 	const imgRef = useRef<HTMLInputElement>(null);
 
+
+
+	// ? Get Authenticated User ? \\
 	const {data:authUser} = useQuery<CreatePostUser | null>({
 		queryKey: ["authenticatedUser"],
 		queryFn: async () => {
@@ -51,9 +65,15 @@ const CreatePost = () => {
 			}
 		}
 	});
+	// ? Get Authenticated User ? \\
+
+
 
 	const queryClient = useQueryClient();
 
+
+	
+	// ? Create Post Mutation ? \\
 	const {mutate:CreatePost, isPending, isError, error} = useMutation({
 		mutationFn : async (postData: {text: string, img: string | null}) => {
 			try {
@@ -88,6 +108,8 @@ const CreatePost = () => {
 			toast.success("Post Created Successfully !");
 		}
 	})
+	// ? Create Post Mutation ? \\
+
 
 
 
@@ -162,7 +184,17 @@ const CreatePost = () => {
 							className='fill-primary w-6 h-6 cursor-pointer'
 							onClick={() => imgRef.current?.click()}
 						/>
-						<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' />
+						<div className="relative">
+							<BsEmojiSmileFill 
+								className='fill-primary w-5 h-5 cursor-pointer' 
+								onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+							/>
+							{showEmojiPicker && (
+								<div className="absolute bottom-10 left-0 z-10">
+									<EmojiPicker onEmojiClick={handleEmojiClick} />
+								</div>
+							)}
+						</div>
 					</div>
 					<input type='file' hidden ref={imgRef} onChange={HandleImgChange} accept="image/*" />
 					<button className='btn btn-primary rounded-full btn-sm text-white px-4'>

@@ -13,9 +13,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { FormatMemberSinceDate } from "../../Utility/GetDateUtility/GetDateUtility";
 import FollowHook from "../../Hooks/FollowHook";
-
+import { IoCloseSharp } from "react-icons/io5";
+import FollowersList from "../../Components/FollowersList/FollowersList";
 
 const ProfilePage = () => {
+
+	// Add state for modal
+	const [showFollowersModal, setShowFollowersModal] = useState(false);
+	const [showFollowingModal, setShowFollowingModal] = useState(false);
 
 	// ? User Interface ? \\
 	interface User {
@@ -40,6 +45,7 @@ const ProfilePage = () => {
 	const [contentType, setContentType] = useState<"posts" | "likes">("posts");
 
 	const {username} = useParams();
+
 
 	// ? Follow Hook That Comes From FollowHook.tsx ? \\
 	const {followUser, isPending} = FollowHook();
@@ -202,7 +208,7 @@ const ProfilePage = () => {
 	return (
 		<>
 			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
-				{/* HEADER */}
+				{/* ? HEADER ? */}
 				{(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
 				{!isLoading && !isRefetching && !user && <p className='text-center text-lg mt-4'>User Not Found !</p>}
 				<div className='flex flex-col'>
@@ -247,7 +253,7 @@ const ProfilePage = () => {
 									ref={profileImgRef}
 									onChange={(e) => HandleImgChange(e, "profileImg")}
 								/>
-								{/* USER AVATAR */}
+								{/* ? USER AVATAR ? */}
 								<div className='avatar absolute -bottom-16 left-4'>
 									<div className='w-32 rounded-full relative group/avatar'>
 										<img src={profileImg || user?.profileImg || PlaceHolderImg} />
@@ -269,9 +275,9 @@ const ProfilePage = () => {
 										className='btn btn-outline rounded-full btn-sm'
 										onClick={() => followUser(user?._id)}
 									>
-										{isPending ? "FOLLOWING..." : "FOLLOW"}
-										{!isPending && IsFollowing && "UNFOLLOW"}
-										{!isPending && !IsFollowing && "FOLLOW"}
+										{isPending ? "FOLLOWING..." : 
+											IsFollowing ? "UNFOLLOW" : "FOLLOW"
+										}
 									</button>
 								)}
 								{(coverImg || profileImg) && (
@@ -297,12 +303,12 @@ const ProfilePage = () => {
 											<>
 												<FaLink className='w-3 h-3 text-slate-500' />
 												<a
-													href='https://youtube.com/@asaprogrammer_'
+													href={user?.link}
 													target='_blank'
 													rel='noreferrer'
 													className='text-sm text-blue-500 hover:underline'
 												>
-													youtube.com/@asaprogrammer_
+													{user?.link}
 												</a>
 											</>
 										</div>
@@ -316,11 +322,21 @@ const ProfilePage = () => {
 								</div>
 								<div className='flex gap-2'>
 									<div className='flex gap-1 items-center'>
-										<span className='font-bold text-xs'>{user?.following.length}</span>
+										<span 
+											className='font-bold text-xs hover:underline cursor-pointer text-amber-500' 
+											onClick={() => setShowFollowingModal(true)}
+										>
+											{user?.following.length}
+										</span>
 										<span className='text-slate-500 text-xs'>Following</span>
 									</div>
 									<div className='flex gap-1 items-center'>
-										<span className='font-bold text-xs'>{user?.followers.length}</span>
+										<span 
+											className='font-bold text-xs hover:underline cursor-pointer text-amber-500'
+											onClick={() => setShowFollowersModal(true)}
+										>
+											{user?.followers.length}
+										</span>
 										<span className='text-slate-500 text-xs'>Followers</span>
 									</div>
 								</div>
@@ -351,6 +367,48 @@ const ProfilePage = () => {
 					<Posts contentType={contentType} username={username} userId={user?._id} />
 				</div>
 			</div>
+
+			{/* Followers Modal */}
+			{showFollowersModal && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+					<div className="bg-base-100 rounded-lg w-96 max-h-[80vh] overflow-hidden flex flex-col">
+						<div className="p-4 border-b border-gray-700 flex justify-between items-center">
+							<h3 className="font-bold">Followers</h3>
+							<button onClick={() => setShowFollowersModal(false)} className="text-gray-500">
+								<IoCloseSharp className="w-5 h-5" />
+							</button>
+						</div>
+						<div className="overflow-y-auto p-4 flex-1">
+							{user?.followers.length === 0 ? (
+								<p className="text-center text-gray-500">No Followers Yet !</p>
+							) : (
+								<FollowersList userIds={user?.followers || []} />
+							)}
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Following Modal */}
+			{showFollowingModal && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+					<div className="bg-base-100 rounded-lg w-96 max-h-[80vh] overflow-hidden flex flex-col">
+						<div className="p-4 border-b border-gray-700 flex justify-between items-center">
+							<h3 className="font-bold">Following</h3>
+							<button onClick={() => setShowFollowingModal(false)} className="text-gray-500">
+								<IoCloseSharp className="w-5 h-5" />
+							</button>
+						</div>
+						<div className="overflow-y-auto p-4 flex-1">
+							{user?.following.length === 0 ? (
+								<p className="text-center text-gray-500">Not Following Anyone Yet !</p>
+							) : (
+								<FollowersList userIds={user?.following || []} />
+							)}
+						</div>
+					</div>
+				</div>
+			)}
 		</>
 	);
 };
