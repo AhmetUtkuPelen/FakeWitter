@@ -125,13 +125,13 @@ export const Login = async (req: Request, res: Response) => {
         const user: IUser | null = await User.findOne({ username: username });
 
         if (!user) {
-            return res.status(400).json({ message: "User Not Found !" });
+            return res.status(400).json({ error: "User Not Found !" });
         }
 
         const isPasswordValid = await bcryptJS.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid Password !" });
+            return res.status(400).json({ error: "Invalid Password !" });
         }
 
         // ? Generate token before sending response ? \\

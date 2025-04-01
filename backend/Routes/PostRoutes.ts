@@ -13,7 +13,7 @@ PostRoutes.get("/user/:username", ProtectedRoute, GetUserPosts);
 PostRoutes.post("/createPost", ProtectedRoute, CreatePost);
 PostRoutes.post("/like/:id", ProtectedRoute, LikeUnlikePost);
 PostRoutes.post("/commentOnPost/:id", ProtectedRoute, CommentOnPost);
-PostRoutes.delete("deletePost/:id", ProtectedRoute, DeletePost);
+PostRoutes.delete("/deletePost/:id", ProtectedRoute, DeletePost);
 
 
 

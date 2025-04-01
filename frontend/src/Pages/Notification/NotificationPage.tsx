@@ -35,13 +35,20 @@ const NotificationPage = () => {
 		queryFn : async () => {
 			try {
 				
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notifications/getNotifications`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notification/getNotifications`, {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					credentials: "include"
 				});
+
+				// Check if response is JSON before parsing
+				const contentType = response.headers.get("content-type");
+				if (!contentType || !contentType.includes("application/json")) {
+					console.error("Non-JSON response received:", await response.text());
+					throw new Error("Server returned non-JSON response");
+				}
 
 				const data = await response.json();
 
@@ -55,6 +62,7 @@ const NotificationPage = () => {
 				if(error instanceof Error){
 					console.log(error.message);
 				}
+				return []; // Return empty array to prevent rendering errors
 			}
 		},
 		retry: false,
@@ -66,13 +74,20 @@ const NotificationPage = () => {
 		mutationFn : async () => {
 			try {
 				
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notifications/deleteNotifications`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notification/deleteNotifications`, {
 					method: "DELETE",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					credentials: "include"
 				});
+
+				// Check if response is JSON before parsing
+				const contentType = response.headers.get("content-type");
+				if (!contentType || !contentType.includes("application/json")) {
+					console.error("Non-JSON response received:", await response.text());
+					throw new Error("Server returned non-JSON response");
+				}
 
 				const data = await response.json();
 
@@ -86,6 +101,7 @@ const NotificationPage = () => {
 				if(error instanceof Error){
 					console.log(error.message);
 				}
+				return []; // Return empty array to prevent rendering errors
 			}
 		},
 		onSuccess : () => {

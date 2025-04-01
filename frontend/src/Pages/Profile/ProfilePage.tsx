@@ -51,7 +51,31 @@ const ProfilePage = () => {
 
 
 	// ? Get Authenticated User ? \\
-	const {data:authUser} = useQuery<User | null>({queryKey:["authenticatedUser"]});
+	const {data:authUser} = useQuery<User | null>({
+		queryKey:["authenticatedUser"],
+		queryFn: async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/getUser`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+				
+				const data = await response.json();
+				
+				if(!response.ok){
+					throw new Error(data.error || "Something went wrong getting user data");
+				}
+				
+				return data;
+			} catch (error) {
+				console.error("Error fetching user:", error);
+				return null;
+			}
+		}
+	});
 	// ? Get Authenticated User ? \\
 
 
@@ -98,7 +122,7 @@ const ProfilePage = () => {
 		mutationFn : async () => {
 			try {
 				
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/updateProfile}`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/updateProfile`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

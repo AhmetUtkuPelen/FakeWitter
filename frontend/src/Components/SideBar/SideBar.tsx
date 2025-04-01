@@ -13,7 +13,15 @@ interface IUser {
     username: string;
     fullName: string;
     profileImg?: string;
-    // Add other properties as needed
+	coverImg?: string;
+	bio: string;
+	link: string;
+	createdAt: Date;
+	following: string[];
+	followers: string[];
+	likedPosts: string[];
+	email: string;
+	updatedAt: Date;
 }
 
 const SideBar = () => {
@@ -25,10 +33,10 @@ const SideBar = () => {
 
 
 
-	const {mutate:LogOut,error} = useMutation({
+	const {mutate:LogOut} = useMutation({
 		mutationFn : async () => {
 			try {
-				const response = await fetch(`http://localhost:9999/api/auth/logout`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -37,14 +45,15 @@ const SideBar = () => {
 				});
 
 				if(!response.ok){
-					throw new Error("Something Went Wrong Logging Out!");
+					const errorData = await response.json();
+					throw new Error(errorData.error || "Something Went Wrong Logging Out!");
 				}
 				
 				return await response.json();
 			
 			} catch (error) {
 				if(error instanceof Error){
-					console.log(error.message);
+					console.log("Logout error:", error.message);
 					throw error;
 				}
 			}
@@ -53,15 +62,50 @@ const SideBar = () => {
 			queryClient.invalidateQueries({queryKey : ["authenticatedUser"]});
 			toast.success("Logged Out Successfully !");
 		},
-		onError : () => {
-			toast.error( error?.message || "Something Went Wrong Logging Out !");
+		onError : (error) => {
+			toast.error(error instanceof Error ? error.message : "Something Went Wrong Logging Out!");
 		}
 	})
 
-	
 
 	// ? Get Authenticated User Query ? \\
-	const {data:authUser} = useQuery<IUser | null>({queryKey:["authenticatedUser"]});
+	const {data:authUser} = useQuery<IUser | null>({
+		queryKey: ["authenticatedUser"],
+		queryFn: async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/getUser`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+				
+				const data = await response.json();
+				
+				if(!response.ok){
+					// If we get a 401 Unauthorized, it's normal after logout
+					if(response.status === 401) {
+						return null;
+					}
+					throw new Error(data.error || "Something went wrong getting user data");
+				}
+				
+				return data;
+			} catch (error) {
+				console.error("Error fetching user:", error);
+				// Don't throw the error, just return null to prevent UI issues
+				return null;
+			}
+		},
+		// Don't retry on 401 errors (which happen after logout)
+		retry: (failureCount, error) => {
+			if (error instanceof Error && error.message.includes("401")) {
+				return false;
+			}
+			return failureCount < 3;
+		}
+	});
 	// ? Get Authenticated User Query ? \\
 
 
@@ -94,7 +138,7 @@ const SideBar = () => {
 
 					<li className='flex justify-center md:justify-start'>
 						<Link
-							to={`/profile/${authUser?.username}`}
+							to={authUser?.username ? `/profile/${authUser.username}` : '/'}
 							className='flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer'
 						>
 							<FaUser className='w-6 h-6' />

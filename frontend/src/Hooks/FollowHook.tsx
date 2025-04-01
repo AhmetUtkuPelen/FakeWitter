@@ -12,7 +12,7 @@ const FollowHook = () => {
 
             try {
 
-                const response = await fetch(`import.meta.env.VITE_BACKEND_URL}/api/user/followUser/${userId}`, {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/followUser/${userId}`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

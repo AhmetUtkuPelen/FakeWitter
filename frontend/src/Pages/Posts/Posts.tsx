@@ -17,15 +17,15 @@ const Posts = ({ contentType, username, userId }: PostsProps) => {
 	const GetContentTypes = () => {
 		switch (contentType) {
 			case "forYou":
-				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/allPosts`;
+				return `${import.meta.env.VITE_BACKEND_URL}/api/post/allPosts`;
 			case "following":
-				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/followingPosts`;
+				return `${import.meta.env.VITE_BACKEND_URL}/api/post/followingPosts`;
 			case "posts":
-				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/userPosts/${username}`;
+				return `${import.meta.env.VITE_BACKEND_URL}/api/post/user/${username}`;
 			case "likes":
-				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/likes/${userId}`;
+				return `${import.meta.env.VITE_BACKEND_URL}/api/post/likes/${userId}`;
 			default:
-				return `${import.meta.env.VITE_BACKEND_URL}/api/posts/allPosts`;
+				return `${import.meta.env.VITE_BACKEND_URL}/api/post/allPosts`;
 		}
 	}
 	// ? Get Content Types ? \\
@@ -42,7 +42,21 @@ const Posts = ({ contentType, username, userId }: PostsProps) => {
 		queryKey : ["posts"],
 		queryFn : async () => {
 			try {
-				const response = await fetch(PostType);
+				const response = await fetch(PostType, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include" // Include cookies for authentication
+				});
+				
+				// Check if response is JSON before parsing
+				const contentType = response.headers.get("content-type");
+				if (!contentType || !contentType.includes("application/json")) {
+					console.error("Non-JSON response received:", await response.text());
+					throw new Error("Server returned non-JSON response");
+				}
+				
 				const data = await response.json();
 				
 				if(!response.ok){
@@ -55,6 +69,7 @@ const Posts = ({ contentType, username, userId }: PostsProps) => {
 				if(error instanceof Error){
 					console.log(error.message);
 				}
+				return []; // Return empty array to prevent rendering errors
 			}
 		}
 	})

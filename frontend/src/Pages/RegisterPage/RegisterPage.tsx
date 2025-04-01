@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { MdOutlineMail } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
@@ -11,6 +11,8 @@ import toast from "react-hot-toast";
 
 
 const RegisterPage = () => {
+
+	const navigate = useNavigate();
 
 	// ? Form Data Interface ? \\
     interface FormData {
@@ -36,7 +38,7 @@ const RegisterPage = () => {
 	const {mutate,isError,isPending,error} =useMutation({
 		mutationFn : async (formData:FormData) => {
 			try {
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register}`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -60,6 +62,7 @@ const RegisterPage = () => {
 		},
 		onSuccess : () => {
 			toast.success("Registered Successfully !");
+			navigate("/login");
 		},
 		onError : () => {
 			toast.error("Something went wrong !");

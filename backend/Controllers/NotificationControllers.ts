@@ -12,7 +12,7 @@ export const GetNotifications = async (req: Request, res: Response) => {
 
         const Notifications : INotification[] = await Notification.find({to : userId}).populate({
             path: "from",
-            select: "username fullName profileImg -password",
+            select: "username fullName profileImg", // Remove the -password exclusion
         }).sort({ createdAt: -1 });
 
         await Notification.updateMany({to : userId}, {read : true});

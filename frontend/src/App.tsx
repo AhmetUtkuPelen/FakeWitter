@@ -7,7 +7,7 @@ import RightPanel from "./Components/RightPanel/RightPanel"
 import NotificationPage from "./Pages/Notification/NotificationPage"
 import ProfilePage from "./Pages/Profile/ProfilePage"
 import { useQuery } from "@tanstack/react-query"
-import toast, { Toaster } from "react-hot-toast"
+import { Toaster } from "react-hot-toast"
 import LoadingSpinner from "./Components/LoadingSpinner/LoadingSpinner"
 
 
@@ -20,19 +20,21 @@ function App() {
     queryKey : ["authenticatedUser"],
     queryFn : async () => {
       try {
+        
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/getUser`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
           credentials: "include"
-        })
+        });
 
-        const data = await response.json();
-
-        if(data.error){
+        // If we get a 401, it means user is not logged in - this is expected
+        if (response.status === 401) {
           return null;
         }
+
+        const data = await response.json();
 
         if(!response.ok){
           throw new Error(data.error || "Something Went Wrong Getting Authenticated User !");
@@ -42,8 +44,11 @@ function App() {
 
       } catch (error) {
         if(error instanceof Error){
-          toast.error(error.message);
+          console.error("Auth error:", error);
+          // Don't show error toast for auth issues - it's normal for users to be logged out
+          // toast.error(error.message);
         }
+        return null;
       }
     },
     retry: false,
@@ -79,3 +84,4 @@ function App() {
 }
 
 export default App
+

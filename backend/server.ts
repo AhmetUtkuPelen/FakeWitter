@@ -1,36 +1,31 @@
 import express from 'express';
 import cors from 'cors';
-import morgan from 'morgan';
 import dotenv from 'dotenv';
-import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
+import helmet from 'helmet';
 import AuthenticationRoutes from './Routes/AuthenticationRoutes';
-import { ConnectDatabase } from './DataBase/DataBase';
 import UserRoutes from './Routes/UserRoutes';
 import PostRoutes from './Routes/PostRoutes';
 import NotificationsRoutes from './Routes/NotificationsRoutes';
+import { ConnectDatabase } from './DataBase/DataBase';
 
 
 
-// ? Config .env ? \\
+// ? Load environment variables ? \\
 dotenv.config();
-// ? Config .env ? \\
+// ? Load environment variables ? \\
 
 
 
 const app = express();
-
-
-
-// ? Port ? \\
 const PORT = process.env.PORT;
-// ? Port ? \\
 
 
 
 // ? Middlewares ? \\
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"]
 }));

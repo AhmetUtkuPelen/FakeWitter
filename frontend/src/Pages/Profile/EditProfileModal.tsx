@@ -59,7 +59,7 @@ const EditProfileModal = ({authUser} : {authUser : User | null}) => {
 		mutationFn : async () => {
 			try {
 				
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/updateProfile}`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/updateProfile`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

@@ -26,19 +26,43 @@ const CreatePost = () => {
 
 	const imgRef = useRef<HTMLInputElement>(null);
 
-	const {data:authUser} = useQuery<CreatePostUser | null>({queryKey : ["authenticatedUser"]});
+	const {data:authUser} = useQuery<CreatePostUser | null>({
+		queryKey: ["authenticatedUser"],
+		queryFn: async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/getUser`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+				
+				const data = await response.json();
+				
+				if(!response.ok){
+					throw new Error(data.error || "Something went wrong getting user data");
+				}
+				
+				return data;
+			} catch (error) {
+				console.error("Error fetching user:", error);
+				return null;
+			}
+		}
+	});
 
 	const queryClient = useQueryClient();
 
 	const {mutate:CreatePost, isPending, isError, error} = useMutation({
-		mutationFn : async (formData:FormData) => {
+		mutationFn : async (postData: {text: string, img: string | null}) => {
 			try {
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/posts/createPost}`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/post/createPost`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify(formData),
+					body: JSON.stringify(postData),
 					credentials: "include"
 				});
 
@@ -53,6 +77,7 @@ const CreatePost = () => {
 			} catch (error) {
 				if(error instanceof Error){
 					console.log(error.message);
+					throw error;
 				}
 			}
 		},
@@ -69,10 +94,19 @@ const CreatePost = () => {
 	// ? Handle Submit ? \\
 	const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const formData = new FormData();
-		formData.append('text', text);
-		if (img) formData.append('img', img);
-		CreatePost(formData);
+		
+		// Validate that either text or image is provided
+		if (!text && !img) {
+			toast.error("Please provide text or an image for your post!");
+			return;
+		}
+		
+		const postData = {
+			text: text,
+			img: img
+		};
+		
+		CreatePost(postData);
 	};
 	// ? Handle Submit ? \\
 

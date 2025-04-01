@@ -67,7 +67,36 @@ const Post = ({post} : PostProps) => {
 
 	const [comment, setComment] = useState<string>("");
 
-	const {data:authUser} = useQuery<User | null>({queryKey:["authenticatedUser"]});
+	const {data:authUser} = useQuery<User | null>({
+		queryKey: ["authenticatedUser"],
+		queryFn: async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/getUser`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include"
+				});
+				
+				// If we get a 401, it means user is not logged in - this is expected
+				if (response.status === 401) {
+					return null;
+				}
+				
+				const data = await response.json();
+				
+				if(!response.ok){
+					throw new Error(data.error || "Something went wrong getting user data");
+				}
+				
+				return data;
+			} catch (error) {
+				console.error("Error fetching user:", error);
+				return null;
+			}
+		}
+	});
 
 	const postOwner : User = post.user;
 	const isLiked : boolean = post.likes.includes(authUser?._id);
@@ -92,7 +121,7 @@ const Post = ({post} : PostProps) => {
 	const {mutate:deletePost,isPending:isDeletingPost} = useMutation({
 		mutationFn : async () => {
 			try {
-				const response = await fetch(`import.meta.env.VITE_BACKEND_URL}/api/posts/deletePost/${post._id}`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/post/deletePost/${post._id}`, {
 					method: "DELETE",
 					headers: {
 						"Content-Type": "application/json",
@@ -100,17 +129,20 @@ const Post = ({post} : PostProps) => {
 					credentials: "include"
 				});
 
-				const data = await response.json();
-
-				if(!response.ok){
-					throw new Error(data.error || "Something Went Wrong Deleting Post !");
+				// Check if response is OK before trying to parse JSON
+				if (!response.ok) {
+					const errorText = await response.text();
+					console.error("Error response:", errorText);
+					throw new Error(errorText || "Something Went Wrong Deleting Post!");
 				}
 				
+				const data = await response.json();
 				return data;
 			
 			} catch (error) {
 				if(error instanceof Error){
 					console.log(error.message);
+					throw error; // Re-throw to trigger onError
 				}
 			}
 		},
@@ -119,8 +151,11 @@ const Post = ({post} : PostProps) => {
 			queryDeleteClient.setQueryData(["posts"], (oldData: any) => {
 				return oldData.filter((p: PostProps['post']) => p._id !== post._id);
 			})
+		},
+		onError: (error) => {
+			toast.error("Failed to delete post");
+			console.error(error);
 		}
-
 	})
 	// ? Delete Post Query ? \\
 
@@ -131,7 +166,7 @@ const Post = ({post} : PostProps) => {
 		mutationFn : async () => {
 			try {
 				
-				const response = await fetch(`import.meta.env.VITE_BACKEND_URL}/api/posts/like/${post._id}`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/post/like/${post._id}`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -139,17 +174,20 @@ const Post = ({post} : PostProps) => {
 					credentials: "include"
 				});
 
-				const data = await response.json();
-
-				if(!response.ok){
-					throw new Error(data.error || "Something Went Wrong Liking Post !");
+				// Check if response is OK before trying to parse JSON
+				if (!response.ok) {
+					const errorText = await response.text();
+					console.error("Error response:", errorText);
+					throw new Error(errorText || "Something Went Wrong Liking Post!");
 				}
 				
+				const data = await response.json();
 				return data;
 
 			} catch (error) {
 				if(error instanceof Error){
 					console.log(error.message);
+					throw error;
 				}
 			}
 		},
@@ -170,27 +208,29 @@ const Post = ({post} : PostProps) => {
 		mutationFn : async () => {
 			try {
 				
-				const response = await fetch(`import.meta.env.VITE_BACKEND_URL}/api/posts/commentOnPost/${post._id}`, {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/post/commentOnPost/${post._id}`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({text : comment}),
 					credentials: "include"
-				}
-				);
+				});
 
-				const data = await response.json();
-
-				if(!response.ok){
-					throw new Error(data.error || "Something Went Wrong Commenting !");
+				// Check if response is OK before trying to parse JSON
+				if (!response.ok) {
+					const errorText = await response.text();
+					console.error("Error response:", errorText);
+					throw new Error(errorText || "Something Went Wrong Commenting!");
 				}
 				
+				const data = await response.json();
 				return data;
 
 			} catch (error) {
 				if(error instanceof Error){
 					console.log(error.message);
+					throw error;
 				}
 			}
 		},
@@ -217,9 +257,15 @@ const Post = ({post} : PostProps) => {
 	// ? Handle Post Comment ?\\
 	const HandlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		
+		// Validate comment before submitting
+		if (!comment.trim()) {
+			toast.error("You need to write something in your comment!");
+			return;
+		}
+		
 		if(isCommenting) return;
 		CommentOnPost();
-		setComment("");
 	};
 	// ? Handle Post Comment\\
 

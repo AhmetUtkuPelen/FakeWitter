@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineMail } from "react-icons/md";
 import { MdPassword } from "react-icons/md";
 import XSvg from "../../Components/svgs/X";
@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 
 const LoginPage = () => {
 
+
+	const navigate = useNavigate();
 
 	// ? Form Data Interface ? \\
   interface FormData {
@@ -37,12 +39,14 @@ const LoginPage = () => {
 	const {mutate,isPending,isError,error} = useMutation({
 		mutationFn : async (formData:FormData) => {
 			try {
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login}`, {
+				
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify(formData),
+					credentials: "include"
 				});
 
 				const data = await response.json();
@@ -56,14 +60,21 @@ const LoginPage = () => {
 			} catch (error) {
 				if(error instanceof Error){
 					toast.error(error.message);
+					console.error("Login error:", error);
 				}
+				return null;
 			}
 		},
 
-		onSuccess : () => {
+		onSuccess : (data) => {
+			if (!data) {
+				toast.error("Login failed - no data returned");
+				return;
+			}
 			// ? Invalidate Authenticated User Query That Comes From App.tsx ? \\
 			queryClient.invalidateQueries({queryKey : ["authenticatedUser"]});
 			toast.success("Logged In Successfully !");
+			navigate("/");
 		},
 		onError : () => {
 			toast.error("Something Went Wrong Logging In !");

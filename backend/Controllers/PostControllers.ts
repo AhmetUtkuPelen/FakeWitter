@@ -12,10 +12,10 @@ export const GetAllPosts = async (req: Request, res: Response) => {
         
         const posts : IPost[] = await Post.find().sort({ createdAt: -1 }).populate({
             path: "user",
-            select: "username fullName profileImg coverImg bio link -password",
+            select: "username fullName profileImg coverImg bio link",
         }).populate({
             path: "comments.user",
-            select: "username fullName profileImg coverImg bio link -password",
+            select: "username fullName profileImg coverImg bio link",
         });
 
         if(posts.length === 0){
@@ -53,10 +53,10 @@ export const GetFollowingPosts = async (req: Request, res: Response) => {
 
         const PostsToFeed : IPost[] = await Post.find({ user: { $in: following } }).sort({ createdAt: -1 }).populate({
             path: "user",
-            select: "username fullName profileImg coverImg bio link -password",
+            select: "username fullName profileImg coverImg bio link",
         }).populate({
             path: "comments.user",
-            select: "username fullName profileImg coverImg bio link -password",
+            select: "username fullName profileImg coverImg bio link",
         });
 
         res.status(200).json(PostsToFeed);
@@ -88,10 +88,10 @@ export const GetLikedPosts = async (req: Request, res: Response) => {
 
         const LikedPosts = await Post.find({ _id: { $in: user.likedPosts } }).sort({ createdAt: -1 }).populate({
             path: "user",
-            select: "username fullName profileImg coverImg bio link -password",
+            select: "username fullName profileImg coverImg bio link",
         }).populate({
             path: "comments.user",
-            select: "username fullName profileImg coverImg bio link -password",
+            select: "username fullName profileImg coverImg bio link",
         });
 
         res.status(200).json(LikedPosts);
@@ -123,10 +123,10 @@ export const GetUserPosts = async (req: Request, res: Response) => {
 
         const UserPostsToGet : IPost[] = await Post.find({ user: user._id }).sort({ createdAt: -1 }).populate({
             path: "user",
-            select: "username fullName profileImg coverImg bio link -password",
+            select: "username fullName profileImg coverImg bio link",
         }).populate({
             path: "comments.user",
-            select: "username fullName profileImg coverImg bio link -password",
+            select: "username fullName profileImg coverImg bio link",
         });
 
         res.status(200).json(UserPostsToGet);
